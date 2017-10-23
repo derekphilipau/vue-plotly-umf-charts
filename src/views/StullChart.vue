@@ -16,6 +16,7 @@
                 :xoxide="this.form.xoxide"
                 :yoxide="this.form.yoxide"
                 :zoxide="this.form.zoxide"
+                :nozeros="this.form.nozeros"
                 :colortype="this.form.colortype"
                 :showRecipes="this.form.showrecipes"
                 :showCones="this.form.conecheck"
@@ -30,6 +31,7 @@
       <b-form :inline="true" v-on:keydown.enter.prevent>
 
         <b-form-group id="xaxis">
+          X axis:
           <b-form-select id="xoxideinput"
                          :options="oxides"
                          v-model="form.xoxide"
@@ -37,6 +39,7 @@
         </b-form-group>
 
         <b-form-group id="yaxis">
+          Y axis:
           <b-form-select id="yoxideinput"
                          :options="oxides"
                          v-model="form.yoxide"
@@ -44,6 +47,7 @@
         </b-form-group>
 
         <b-form-group id="zaxis">
+          Z axis:
           <b-form-select id="zoxideinput"
                          :options="oxides"
                          v-model="form.zoxide"
@@ -54,6 +58,13 @@
           <b-button @click="resetForm" variant="secondary">Reset Form</b-button>
         </b-form-group>
       </b-form>
+    </div>
+    <div class="row">
+      <b-form-group id="nozeros">
+        <b-form-checkbox v-model="form.nozeros" id="nozeros">
+          Recipes must contain <em>ALL</em> oxides (X, Y, and Z)
+        </b-form-checkbox>
+      </b-form-group>
     </div>
   </div>
 </template>
@@ -91,7 +102,8 @@ export default {
         cone: null,
         xoxide: 'Fe2O3',
         yoxide: 'SiO2',
-        zoxide: 'Al2O3'
+        zoxide: 'Al2O3',
+        nozeros: false
       },
       chartWidth: 0,
       chartHeight: 0,

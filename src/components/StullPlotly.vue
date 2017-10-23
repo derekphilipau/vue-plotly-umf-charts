@@ -41,6 +41,10 @@
         type: String,
         default: Analysis.OXIDE_NAME.Al2O3
       },
+      nozeros: {
+        type: Boolean,
+        default: false
+      },
       height: {
         type: Number,
         default: 500
@@ -119,16 +123,7 @@
       zoxide: function (newValue) {
         this.reset()
       },
-      showCones: function (newValue) {
-        this.reset()
-      },
-      showRecipes: function (newValue) {
-        this.reset()
-      },
-      showStullHeatmap: function (newValue) {
-        this.reset()
-      },
-      showStullChart: function (newValue) {
+      nozeros: function (newValue) {
         this.reset()
       },
       width: function (newValue) {
@@ -177,36 +172,28 @@
           text: []
         }
 
-        var searchString = null
-        if (this.search && this.search.length >= this.minSearchTextLength) {
-          searchString = this.search.toLowerCase()
-        }
-
         for (var i = 0; i < mylen; i++) {
           var xVal = parseFloat(mydata[i].analysis.umfAnalysis[this.xoxide])
           var yVal = parseFloat(mydata[i].analysis.umfAnalysis[this.yoxide])
           var zVal = parseFloat(mydata[i].analysis.umfAnalysis[this.zoxide])
-          if (isNaN(zVal)) {
-            // Just set z value to 0 if none
-            zVal = 0.0
+          if (isNaN(xVal)) {
+            // Just set x value to 0 if none
+            xVal = 0.0
           }
 
           // Check data for any recipes lacking information
           if (!isNaN(xVal) && !isNaN(yVal)) {
-            if (searchString) {
-              if ((!mydata[i].name || mydata[i].name === undefined) ||
-                mydata[i].name.toLowerCase().indexOf(searchString) === -1) {
-                continue
-              }
+            if (!this.nozeros || (xVal > 0 && yVal > 0 && zVal > 0)) {
+              var currentLength = filtereddata.x.length
+              filtereddata.x[currentLength] = xVal
+              filtereddata.y[currentLength] = yVal
+              filtereddata.z[currentLength] = zVal
+              filtereddata.text[currentLength] = mydata[i].name
             }
-
-            var currentLength = filtereddata.x.length
-            filtereddata.x[currentLength] = xVal
-            filtereddata.y[currentLength] = yVal
-            filtereddata.z[currentLength] = zVal
-            filtereddata.text[currentLength] = mydata[i].name
           }
         }
+
+        console.log('Number of Recipes: ' + filtereddata.x.length)
 
         return filtereddata
       }
