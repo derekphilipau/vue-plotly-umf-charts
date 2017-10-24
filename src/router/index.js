@@ -1,7 +1,7 @@
 import Vue from 'vue'
 import Router from 'vue-router'
 
-import StullChart from '@/views/StullChart'
+import UmfChart from '@/views/UmfChart'
 
 Vue.use(Router)
 
@@ -9,8 +9,8 @@ export default new Router({
   routes: [
     {
       path: '/',
-      name: 'StullChart',
-      component: StullChart
+      name: 'UmfChart',
+      component: UmfChart
     }
   ]
 })
