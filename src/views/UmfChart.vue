@@ -76,6 +76,38 @@
         </div>
       </div>
     </div>
+    <div class="columns">
+      <div class="column">
+        <table class="r2o-colors" v-if="form.colortype==='r2o'">
+          <tbody>
+          <tr>
+            <td class="label">R<sub>2</sub>O:RO</td>
+            <td class="r2ocolor-b-100">1:0</td>
+            <td class="r2ocolor-b-95"></td>
+            <td class="r2ocolor-b-90">.9:.1</td>
+            <td class="r2ocolor-b-85"></td>
+            <td class="r2ocolor-b-80">.8:.2</td>
+            <td class="r2ocolor-b-75"></td>
+            <td class="r2ocolor-b-70">.7:.3</td>
+            <td class="r2ocolor-b-65"></td>
+            <td class="r2ocolor-b-60">.6:.4</td>
+            <td class="r2ocolor-b-55"></td>
+            <td class="r2ocolor-b-50">.5:.5</td>
+            <td class="r2ocolor-b-45"></td>
+            <td class="r2ocolor-b-40">.4:.6</td>
+            <td class="r2ocolor-b-35"></td>
+            <td class="r2ocolor-b-30">.3:.7</td>
+            <td class="r2ocolor-b-25"></td>
+            <td class="r2ocolor-b-20">.2:.8</td>
+            <td class="r2ocolor-b-15"></td>
+            <td class="r2ocolor-b-10">.1:.9</td>
+            <td class="r2ocolor-b-5"></td>
+            <td class="r2ocolor-b-0">0:1</td>
+          </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
   </section>
 </template>
 
@@ -227,35 +259,40 @@ export default {
   .orton-b-14 {  background-color: #ffffff; }
 
   .r2o-colors tr td {
+    color: #ffffff;
     font-size: .85em;
+    line-height: 1em;
     padding: .2em;
     width: 2.5em;
     border: 1px solid white;
+    text-align: center;
   }
   .r2o-colors tr td.label {
+    color: #000000;
     white-space:nowrap;
+    width: 60px;
   }
 
-  .r2ocolor-b-100 { background-color: rgba(195, 150, 150, 1); }
-  .r2ocolor-b-95  { background-color: rgba(210, 150, 150, 1); }
-  .r2ocolor-b-90  { background-color: rgba(225, 150, 150, 1); }
-  .r2ocolor-b-85  { background-color: rgba(240, 150, 150, 1); }
-  .r2ocolor-b-80  { background-color: rgba(255, 150, 150, 1); }
-  .r2ocolor-b-75  { background-color: rgba(255, 165, 150, 1); }
-  .r2ocolor-b-70  { background-color: rgba(255, 180, 150, 1); }
-  .r2ocolor-b-65  { background-color: rgba(255, 195, 150, 1); }
-  .r2ocolor-b-60  { background-color: rgba(255, 210, 150, 1); }
-  .r2ocolor-b-55  { background-color: rgba(255, 225, 150, 1); }
-  .r2ocolor-b-50  { background-color: rgba(255, 240, 150, 1); }
-  .r2ocolor-b-45  { background-color: rgba(255, 255, 165, 1); }
-  .r2ocolor-b-40  { background-color: rgba(255, 255, 195, 1); }
-  .r2ocolor-b-35  { background-color: rgba(255, 255, 225, 1); }
-  .r2ocolor-b-30  { background-color: rgba(255, 255, 255, 1); }
-  .r2ocolor-b-25  { background-color: rgba(240, 240, 255, 1); }
-  .r2ocolor-b-20  { background-color: rgba(225, 225, 255, 1); }
-  .r2ocolor-b-15  { background-color: rgba(210, 210, 255, 1); }
-  .r2ocolor-b-10  { background-color: rgba(195, 195, 255, 1); }
-  .r2ocolor-b-5   { background-color: rgba(180, 180, 255, 1); }
-  .r2ocolor-b-0   { background-color: rgba(165, 165, 255, 1); }
+  .r2ocolor-b-100 { background-color: #FF3333; }
+  .r2ocolor-b-95  { background-color: #F4333D; }
+  .r2ocolor-b-90  { background-color: #EA3347; }
+  .r2ocolor-b-85  { background-color: #E03351; }
+  .r2ocolor-b-80  { background-color: #D6335B; }
+  .r2ocolor-b-75  { background-color: #CC3366; }
+  .r2ocolor-b-70  { background-color: #C13370; }
+  .r2ocolor-b-65  { background-color: #B7337A; }
+  .r2ocolor-b-60  { background-color: #AD3384; }
+  .r2ocolor-b-55  { background-color: #A3338E; }
+  .r2ocolor-b-50  { background-color: #993399; }
+  .r2ocolor-b-45  { background-color: #8E33A3; }
+  .r2ocolor-b-40  { background-color: #8433AD; }
+  .r2ocolor-b-35  { background-color: #7A33B7; }
+  .r2ocolor-b-30  { background-color: #7033C1; }
+  .r2ocolor-b-25  { background-color: #6633CC; }
+  .r2ocolor-b-20  { background-color: #5B33D6; }
+  .r2ocolor-b-15  { background-color: #5133E0; }
+  .r2ocolor-b-10  { background-color: #4733EA; }
+  .r2ocolor-b-5   { background-color: #3D33F4; }
+  .r2ocolor-b-0   { background-color: #3333FF; }
 
 </style>

@@ -142,9 +142,11 @@
             size: 4,
             opacity: 0.5
           },
+          hoverinfo: 'text',
           x: [],
           y: [],
           z: [],
+          name: [],
           text: []
         }
 
@@ -164,7 +166,9 @@
               filtereddata.x[currentLength] = xVal
               filtereddata.y[currentLength] = yVal
               filtereddata.z[currentLength] = zVal
-              filtereddata.text[currentLength] = mydata[i].name
+
+              var cones = this.getConeString(mydata[i].fromOrtonConeId, mydata[i].toOrtonConeId, false)
+              filtereddata.text[currentLength] = cones + ' ' + mydata[i].name
               filtereddata.marker.color[currentLength] =
                 this.getR2OFillColor(mydata[i].analysis.umfAnalysis.R2OTotal)
             }
@@ -247,8 +251,8 @@
       },
       getConeString: function (fromOrtonConeId, toOrtonConeId, isHtml = false) {
         var ortonCone = ''
-        // var deltaString = '\u0394';
-        var deltaString = '' // Don't show delta in chart
+        var deltaString = '\u0394'
+        // var deltaString = 'Δ'
         if (isHtml) {
           deltaString = '&Delta;'
         }
@@ -397,29 +401,6 @@
         font-size: .75rem;
         font-weight: 200;
     }
-
-    .r2ocolor    { fill: rgba(200, 200, 200, 1); }
-    .r2ocolor100 { fill: rgba(195, 150, 150, 1); }
-    .r2ocolor95  { fill: rgba(210, 150, 150, 1); }
-    .r2ocolor90  { fill: rgba(225, 150, 150, 1); }
-    .r2ocolor85  { fill: rgba(240, 150, 150, 1); }
-    .r2ocolor80  { fill: rgba(255, 150, 150, 1); }
-    .r2ocolor75  { fill: rgba(255, 165, 150, 1); }
-    .r2ocolor70  { fill: rgba(255, 180, 150, 1); }
-    .r2ocolor65  { fill: rgba(255, 195, 150, 1); }
-    .r2ocolor60  { fill: rgba(255, 210, 150, 1); }
-    .r2ocolor55  { fill: rgba(255, 225, 150, 1); }
-    .r2ocolor50  { fill: rgba(255, 240, 150, 1); }
-    .r2ocolor45  { fill: rgba(255, 255, 165, 1); }
-    .r2ocolor40  { fill: rgba(255, 255, 195, 1); }
-    .r2ocolor35  { fill: rgba(255, 255, 225, 1); }
-    .r2ocolor30  { fill: rgba(255, 255, 255, 1); }
-    .r2ocolor25  { fill: rgba(240, 240, 255, 1); }
-    .r2ocolor20  { fill: rgba(225, 225, 255, 1); }
-    .r2ocolor15  { fill: rgba(210, 210, 255, 1); }
-    .r2ocolor10  { fill: rgba(195, 195, 255, 1); }
-    .r2ocolor5   { fill: rgba(180, 180, 255, 1); }
-    .r2ocolor0   { fill: rgba(165, 165, 255, 1); }
 
     .glazetype460 {  fill: #ffffff;  }
     .glazetype470 {  fill: #ffffff;  }
