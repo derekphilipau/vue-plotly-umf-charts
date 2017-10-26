@@ -251,6 +251,7 @@
       },
       get2DLayout: function () {
         var layout = {
+          hovermode: 'closest',
           xaxis: {
           },
           yaxis: {
