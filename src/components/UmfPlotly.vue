@@ -29,19 +29,23 @@
         type: String,
         default: null
       },
-      xoxide: {
+      oxide3: {
         type: String,
         default: Analysis.OXIDE_NAME.Fe2O3
       },
-      yoxide: {
+      oxide2: {
         type: String,
         default: Analysis.OXIDE_NAME.SiO2
       },
-      zoxide: {
+      oxide1: {
         type: String,
         default: Analysis.OXIDE_NAME.Al2O3
       },
       nozeros: {
+        type: Boolean,
+        default: false
+      },
+      isThreeAxes: {
         type: Boolean,
         default: false
       },
@@ -96,7 +100,11 @@
       }
     },
     mounted () {
-      this.plotlyChart()
+      if (this.isThreeAxes) {
+        this.plotly3DChart()
+      } else {
+        this.plotly2DChart()
+      }
     },
     watch: {
       recipeData: function (newValue) {
@@ -105,16 +113,19 @@
       extraRegions: function (newValue) {
         this.reset()
       },
-      xoxide: function (newValue) {
+      oxide3: function (newValue) {
         this.reset()
       },
-      yoxide: function (newValue) {
+      oxide2: function (newValue) {
         this.reset()
       },
-      zoxide: function (newValue) {
+      oxide1: function (newValue) {
         this.reset()
       },
       nozeros: function (newValue) {
+        this.reset()
+      },
+      isThreeAxes: function (newValue) {
         this.reset()
       }
     },
@@ -134,29 +145,51 @@
         }
 
         var mylen = mydata.length
-        var filtereddata = {
-          type: 'scatter3d',
-          mode: 'markers',
-          marker: {
-            color: [],
-            size: 4,
-            opacity: 0.5
-          },
-          hoverinfo: 'text',
-          x: [],
-          y: [],
-          z: [],
-          name: [],
-          text: []
+        var filtereddata = {}
+        if (this.isThreeAxes) {
+          filtereddata = {
+            type: 'scatter3d',
+            mode: 'markers',
+            marker: {
+              color: [],
+              size: 4,
+              opacity: 0.5
+            },
+            hoverinfo: 'text',
+            x: [],
+            y: [],
+            z: [],
+            name: [],
+            text: []
+          }
+        } else {
+          filtereddata = {
+            type: 'scatter',
+            mode: 'markers',
+            marker: {
+              color: [],
+              size: 8,
+              opacity: 0.5
+            },
+            hoverinfo: 'text',
+            x: [],
+            y: [],
+            z: [],
+            name: [],
+            text: []
+          }
         }
-
         for (var i = 0; i < mylen; i++) {
-          var xVal = parseFloat(mydata[i].analysis.umfAnalysis[this.xoxide])
-          var yVal = parseFloat(mydata[i].analysis.umfAnalysis[this.yoxide])
-          var zVal = parseFloat(mydata[i].analysis.umfAnalysis[this.zoxide])
-          if (isNaN(xVal)) {
-            // Just set x value to 0 if none
-            xVal = 0.0
+          var xVal = 0.0
+          var yVal = 0.0
+          var zVal = 0.0
+          if (this.isThreeAxes) {
+            xVal = parseFloat(mydata[i].analysis.umfAnalysis[this.oxide3])
+            zVal = parseFloat(mydata[i].analysis.umfAnalysis[this.oxide1])
+            yVal = parseFloat(mydata[i].analysis.umfAnalysis[this.oxide2])
+          } else {
+            xVal = parseFloat(mydata[i].analysis.umfAnalysis[this.oxide2])
+            yVal = parseFloat(mydata[i].analysis.umfAnalysis[this.oxide1])
           }
 
           // Check data for any recipes lacking information
@@ -181,13 +214,20 @@
       }
     },
     methods: {
-      plotlyChart: function () {
+      plotly3DChart: function () {
         var data = [this.filtereddata]
+        Plotly.newPlot('stull-chart-d3', data, this.get3DLayout())
+      },
+      plotly2DChart: function () {
+        var data = [this.filtereddata]
+        Plotly.newPlot('stull-chart-d3', data, this.get2DLayout())
+      },
+      get3DLayout: function () {
         var layout = {
           scene: {
-            xaxis: {title: this.xoxide},
-            yaxis: {title: this.yoxide},
-            zaxis: {title: this.zoxide},
+            xaxis: {title: this.oxide3},
+            yaxis: {title: this.oxide2},
+            zaxis: {title: this.oxide1},
             aspectratio: {
               x: 0.5, y: 3, z: 0.8
             },
@@ -207,11 +247,100 @@
             t: 0
           }
         }
+        return layout
+      },
+      get2DLayout: function () {
+        var layout = {
+          xaxis: {
+          },
+          yaxis: {
+          },
+          title: 'Data Labels Hover',
+          margin: {
+            l: 0,
+            r: 0,
+            b: 0,
+            t: 0
+          },
+          shapes: [
+            // Stull Unfused
+            {
+              type: 'path',
+              layer: 'below',
+              path: ' M 0.5,0.39 L2.8,1.0 L0.5,1.0 Z',
+              fillcolor: 'rgba(102, 255, 102, 0.5)',
+              line: {
+                color: 'transparent',
+                width: 0
+              }
+            },
+            // Stull Matte
+            {
+              type: 'path',
+              layer: 'below',
+              path: ' M 0.5,0.05 L0.5,0.39 L2.8,1.0 L4.0,1.0 Z',
+              fillcolor: 'rgba(153, 255, 153, 0.5)',
+              line: {
+                color: 'transparent',
+                width: 0
+              }
+            },
+            // Stull Semi-Matte
+            {
+              type: 'path',
+              layer: 'below',
+              path: ' M 1.2,0.242 L4.0,1.0 L5.0,1.0 Z',
+              fillcolor: 'rgba(204, 255, 204, 0.5)',
+              line: {
+                color: 'transparent',
+                width: 0
+              }
+            },
+            // Stull Under-fired
+            {
+              type: 'path',
+              layer: 'below',
+              path: ' M 1.75,0.0 L7.2,0.65 L7.2,0.0 Z',
+              fillcolor: 'rgba(102, 255, 102, 0.5)',
+              line: {
+                color: 'transparent',
+                width: 0
+              }
+            },
+            // Stull Crazed
+            {
+              type: 'path',
+              layer: 'below',
+              path: ' M 0.5,0.0 L0.5,1.0 L1.67,1.0 L2.1,0.5 L2.38,0.25 L2.7,0.23 L3.3,0.25 L3.9,0.28 L4.2,0.29 L5.4,0.49 L7.2,0.615 L7.2,0 Z',
+              fillcolor: 'rgba(221, 221, 221, 0.5)',
+              line: {
+                color: 'transparent',
+                width: 0
+              }
+            },
+            // Stull Q-line
+            {
+              type: 'path',
+              layer: 'below',
+              path: ' M 1.8,0.2 L4.2,0.6 L6.0,0.8 L7.2,0.92',
+              fillcolor: 'transparent',
+              line: {
+                color: 'rgba(0, 0, 0, 0.5)',
+                width: 0.5,
+                dash: 'dot'
+              }
+            }
+          ]
+        }
 
-        Plotly.newPlot('stull-chart-d3', data, layout)
+        return layout
       },
       reset: function () {
-        this.plotlyChart()
+        if (this.isThreeAxes) {
+          this.plotly3DChart()
+        } else {
+          this.plotly2DChart()
+        }
       },
       clickedrecipe: function (d) {
         if (d.id) {
@@ -252,7 +381,6 @@
       getConeString: function (fromOrtonConeId, toOrtonConeId, isHtml = false) {
         var ortonCone = ''
         var deltaString = '\u0394'
-        // var deltaString = 'Δ'
         if (isHtml) {
           deltaString = '&Delta;'
         }

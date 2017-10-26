@@ -10,10 +10,11 @@
         <div id="stull-chart-d3">
           <umf-plotly
                   :recipeData="this.jsondata.data"
-                  :xoxide="this.form.xoxide"
-                  :yoxide="this.form.yoxide"
-                  :zoxide="this.form.zoxide"
+                  :oxide1="this.form.oxide1"
+                  :oxide2="this.form.oxide2"
+                  :oxide3="this.form.oxide3"
                   :nozeros="this.form.nozeros"
+                  :isThreeAxes="this.form.isThreeAxes"
                   :colortype="this.form.colortype"
                   :showRecipes="this.form.showrecipes"
                   :showCones="this.form.conecheck"
@@ -28,8 +29,8 @@
     <div class="columns">
       <div class="column">
         <div class="field is-horizontal">
-          <b-field id="xaxis" label="X axis">
-            <b-select v-model="form.xoxide">
+          <b-field id="oxide1">
+            <b-select v-model="form.oxide1">
               <option
                       v-for="option in oxides"
                       :value="option.value"
@@ -40,8 +41,8 @@
             </b-select>
           </b-field>
 
-          <b-field id="yaxis" label="Y axis">
-            <b-select v-model="form.yoxide">
+          <b-field id="oxide2">
+            <b-select v-model="form.oxide2">
               <option
                       v-for="option in oxides"
                       :value="option.value"
@@ -52,8 +53,8 @@
             </b-select>
           </b-field>
 
-          <b-field id="zaxis" label="Z axis">
-            <b-select v-model="form.zoxide">
+          <b-field id="oxide3" v-if="this.form.isThreeAxes">
+            <b-select v-model="form.oxide3">
               <option
                       v-for="option in oxides"
                       :value="option.value"
@@ -63,6 +64,7 @@
               </option>
             </b-select>
           </b-field>
+
           <button class="button is-info" @click="resetForm">Reset Form</button>
         </div>
       </div>
@@ -72,6 +74,11 @@
         <div class="field is-horizontal">
           <b-checkbox v-model="form.nozeros">
             Recipes must contain <em>ALL</em> oxides (X, Y, and Z)
+          </b-checkbox>
+        </div>
+        <div class="field is-horizontal">
+          <b-checkbox v-model="form.isThreeAxes">
+            3-Axis 3D
           </b-checkbox>
         </div>
       </div>
@@ -142,10 +149,11 @@ export default {
         glazetype: 0,
         colortype: 'r2o',
         cone: null,
-        xoxide: 'Fe2O3',
-        yoxide: 'SiO2',
-        zoxide: 'Al2O3',
-        nozeros: false
+        oxide3: 'Fe2O3',
+        oxide2: 'SiO2',
+        oxide1: 'Al2O3',
+        nozeros: false,
+        isThreeAxes: true
       },
       oxides: Analysis.OXIDE_NAME_UNICODE_SELECT,
       glazetypes: new GlazyConstants().GLAZE_TYPES_SELECT,
@@ -189,9 +197,9 @@ export default {
       this.form.showstullchart = true
       this.form.glazetype = 0
       this.form.cone = null
-      this.form.xoxide = Analysis.OXIDE_NAME.Fe2O3
-      this.form.yoxide = Analysis.OXIDE_NAME.SiO2
-      this.form.zoxide = Analysis.OXIDE_NAME.Al2O3
+      this.form.oxide1 = Analysis.OXIDE_NAME.Al2O3
+      this.form.oxide2 = Analysis.OXIDE_NAME.SiO2
+      this.form.oxide3 = Analysis.OXIDE_NAME.Fe2O3
       this.searchtext = ''
     }
   },
