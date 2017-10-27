@@ -113,13 +113,13 @@
         this.reset()
       },
       oxide3: function (newValue) {
-        this.reset()
+        this.reset(true)
       },
       oxide2: function (newValue) {
-        this.reset()
+        this.reset(true)
       },
       oxide1: function (newValue) {
-        this.reset()
+        this.reset(true)
       },
       glazeType: function (newValue) {
         this.reset(true)
