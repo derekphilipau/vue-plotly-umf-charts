@@ -145,7 +145,7 @@
 
 <script>
 import UmfPlotly from '../components/UmfPlotly'
-import StaticDataset from '../../static/data/all_api_output.edit.mini.json'
+import StaticDataset from '../../static/data/all_api_output.edit.short.mini.json'
 
 import Analysis from 'ceramicscalc-js/src/analysis/Analysis'
 import GlazyConstants from 'ceramicscalc-js/src/helpers/GlazyConstants'
@@ -176,7 +176,7 @@ export default {
         oxide3: 'Fe2O3',
         oxide2: 'SiO2',
         oxide1: 'Al2O3',
-        noZeros: false,
+        noZeros: true,
         isThreeAxes: false
       },
       oxides: Analysis.OXIDE_NAME_UNICODE_SELECT,
@@ -220,6 +220,7 @@ export default {
       this.form.showStullChart = true
       this.form.glazeType = 0
       this.form.cone = null
+      this.form.noZeros = true
       this.form.oxide1 = Analysis.OXIDE_NAME.Al2O3
       this.form.oxide2 = Analysis.OXIDE_NAME.SiO2
       this.form.oxide3 = Analysis.OXIDE_NAME.Fe2O3

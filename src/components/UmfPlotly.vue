@@ -219,13 +219,13 @@
 
         for (var i = 0; i < mylen; i++) {
           if (glazeTypeBranch.length > 0) {
-            if (glazeTypeBranch.indexOf(mydata[i].materialTypeId) < 0) {
+            if (glazeTypeBranch.indexOf(mydata[i].mti) < 0) {
               continue
             }
           }
           if (searchString) {
-            if ((!mydata[i].name || mydata[i].name === undefined) ||
-              mydata[i].name.toLowerCase().indexOf(searchString) === -1) {
+            if ((!mydata[i].n || mydata[i].n === undefined) ||
+              mydata[i].n.toLowerCase().indexOf(searchString) === -1) {
               continue
             }
           }
@@ -234,21 +234,20 @@
           var yVal = 0.0
           var zVal = 0.0
           if (this.isThreeAxes) {
-            xVal = parseFloat(mydata[i].analysis.umfAnalysis[this.oxide3])
-            zVal = parseFloat(mydata[i].analysis.umfAnalysis[this.oxide1])
-            yVal = parseFloat(mydata[i].analysis.umfAnalysis[this.oxide2])
-            if (isNaN(zVal) || isNaN(yVal)) {
-              continue
-            }
-            if (isNaN(xVal)) {
-              xVal = 0.0
-            }
+            xVal = parseFloat(mydata[i].a.umf[Analysis.OXIDE_NAME_SHORT[this.oxide3]])
+            zVal = parseFloat(mydata[i].a.umf[Analysis.OXIDE_NAME_SHORT[this.oxide1]])
+            yVal = parseFloat(mydata[i].a.umf[Analysis.OXIDE_NAME_SHORT[this.oxide2]])
+
+            if (isNaN(xVal)) { xVal = 0.0 }
+            if (isNaN(zVal)) { zVal = 0.0 }
+            if (isNaN(yVal)) { yVal = 0.0 }
+
             if (this.noZeros && (xVal <= 0 || yVal <= 0 || zVal <= 0)) {
               continue
             }
           } else {
-            xVal = parseFloat(mydata[i].analysis.umfAnalysis[this.oxide2])
-            yVal = parseFloat(mydata[i].analysis.umfAnalysis[this.oxide1])
+            xVal = parseFloat(mydata[i].a.umf[Analysis.OXIDE_NAME_SHORT[this.oxide2]])
+            yVal = parseFloat(mydata[i].a.umf[Analysis.OXIDE_NAME_SHORT[this.oxide1]])
 
             if (isNaN(xVal) || isNaN(yVal)) {
               continue
@@ -270,15 +269,15 @@
           filtereddata.z[currentLength] = zVal
 
           var rt = ''
-          var cones = this.getConeString(mydata[i].fromOrtonConeId, mydata[i].toOrtonConeId, false)
+          var cones = this.getConeString(mydata[i].foci, mydata[i].toci, false)
           if (cones) {
             rt += cones + ' '
           }
-          rt += mydata[i].name
-          if (mydata[i].materialTypeId &&
-            mydata[i].materialTypeId in this.constants.GLAZE_TYPES) {
+          rt += mydata[i].n
+          if (mydata[i].mti &&
+            mydata[i].mti in this.constants.GLAZE_TYPES) {
             rt += '<br><span style="color:#cccccc">' +
-              this.constants.GLAZE_TYPES[mydata[i].materialTypeId] +
+              this.constants.GLAZE_TYPES[mydata[i].mti] +
               '</span>'
           }
           rt += '<br>'
@@ -296,17 +295,17 @@
               Analysis.OXIDE_NAME_DISPLAY[this.oxide1]
           }
           rt += '<br><span style="color:yellow">' +
-            Number(mydata[i].analysis.umfAnalysis.SiO2Al2O3Ratio).toFixed(2) +
+            Number(mydata[i].a.umf.SiAl).toFixed(2) +
             '</span> SiO<sub>2</sub>:Al<sub>2</sub>O<sub>3</sub>' +
             '<br><span style="color:yellow">' +
-            Number(mydata[i].analysis.umfAnalysis.R2OTotal).toFixed(2) + ':' +
-            Number(mydata[i].analysis.umfAnalysis.ROTotal).toFixed(2) +
+            Number(mydata[i].a.umf.R2O).toFixed(2) + ':' +
+            Number(mydata[i].a.umf.RO).toFixed(2) +
             '</span> R<sub>2</sub>O:RO'
 
           filtereddata.text[currentLength] = rt
           filtereddata.customdata[currentLength] = mydata[i].id
           filtereddata.marker.color[currentLength] =
-            this.getR2OFillColor(mydata[i].analysis.umfAnalysis.R2OTotal)
+            this.getR2OFillColor(mydata[i].a.umf.R2O)
         }
 
         console.log('Number of Recipes: ' + filtereddata.x.length)
