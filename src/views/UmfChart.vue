@@ -13,7 +13,7 @@
                   :oxide1="this.form.oxide1"
                   :oxide2="this.form.oxide2"
                   :oxide3="this.form.oxide3"
-                  :nozeros="this.form.nozeros"
+                  :noZeros="this.form.noZeros"
                   :isThreeAxes="this.form.isThreeAxes"
                   :colortype="this.form.colortype"
                   :glazeType="this.form.glazeType"
@@ -92,7 +92,7 @@
     <div class="columns">
       <div class="column">
         <div class="field is-horizontal"  v-if="form.isThreeAxes">
-          <b-checkbox v-model="form.nozeros">
+          <b-checkbox v-model="form.noZeros">
             Recipes must contain <em>ALL</em> oxides (X, Y, and Z)
           </b-checkbox>
         </div>
@@ -176,7 +176,7 @@ export default {
         oxide3: 'Fe2O3',
         oxide2: 'SiO2',
         oxide1: 'Al2O3',
-        nozeros: false,
+        noZeros: false,
         isThreeAxes: false
       },
       oxides: Analysis.OXIDE_NAME_UNICODE_SELECT,

@@ -41,7 +41,7 @@
         type: String,
         default: Analysis.OXIDE_NAME.Al2O3
       },
-      nozeros: {
+      noZeros: {
         type: Boolean,
         default: false
       },
@@ -127,8 +127,8 @@
       search: function (newValue) {
         this.reset(true)
       },
-      nozeros: function (newValue) {
-        this.reset()
+      noZeros: function (newValue) {
+        this.reset(true)
       },
       isThreeAxes: function (newValue) {
         this.reset(true)
@@ -224,9 +224,22 @@
             xVal = parseFloat(mydata[i].analysis.umfAnalysis[this.oxide3])
             zVal = parseFloat(mydata[i].analysis.umfAnalysis[this.oxide1])
             yVal = parseFloat(mydata[i].analysis.umfAnalysis[this.oxide2])
+            if (isNaN(zVal) || isNaN(yVal)) {
+              continue
+            }
+            if (isNaN(xVal)) {
+              xVal = 0.0
+            }
+            if (this.noZeros && (xVal <= 0 || yVal <= 0 || zVal <= 0)) {
+              continue
+            }
           } else {
             xVal = parseFloat(mydata[i].analysis.umfAnalysis[this.oxide2])
             yVal = parseFloat(mydata[i].analysis.umfAnalysis[this.oxide1])
+
+            if (isNaN(xVal) || isNaN(yVal)) {
+              continue
+            }
             // Adjust coordinates using stacked collision
             var point = xVal.toFixed(2) + ':' + yVal.toFixed(2)
             if (point in matrix) {
@@ -238,54 +251,49 @@
             }
           }
 
-          // Check data for any recipes lacking information
-          if (!isNaN(xVal) && !isNaN(yVal)) {
-            if (!this.nozeros || (xVal > 0 && yVal > 0 && zVal > 0)) {
-              var currentLength = filtereddata.x.length
-              filtereddata.x[currentLength] = xVal
-              filtereddata.y[currentLength] = yVal
-              filtereddata.z[currentLength] = zVal
+          var currentLength = filtereddata.x.length
+          filtereddata.x[currentLength] = xVal
+          filtereddata.y[currentLength] = yVal
+          filtereddata.z[currentLength] = zVal
 
-              var rt = ''
-              var cones = this.getConeString(mydata[i].fromOrtonConeId, mydata[i].toOrtonConeId, false)
-              if (cones) {
-                rt += cones + ' '
-              }
-              rt += mydata[i].name
-              if (mydata[i].materialTypeId &&
-                mydata[i].materialTypeId in this.constants.GLAZE_TYPES) {
-                rt += '<br><span style="color:#cccccc">' +
-                  this.constants.GLAZE_TYPES[mydata[i].materialTypeId] +
-                  '</span>'
-              }
-              rt += '<br>'
-              if (this.isThreeAxis) {
-                rt += Number(xVal).toFixed(2) +
-                  ' ' + Analysis.OXIDE_NAME_DISPLAY[this.oxide3] + ' ' +
-                  Number(zVal).toFixed(2) + ' ' +
-                  Analysis.OXIDE_NAME_DISPLAY[this.oxide1] + ' ' +
-                  Number(yVal).toFixed(2) + ' ' +
-                  Analysis.OXIDE_NAME_DISPLAY[this.oxide2]
-              } else {
-                rt += Number(xVal).toFixed(2) +
-                  ' ' + Analysis.OXIDE_NAME_DISPLAY[this.oxide2] + ' ' +
-                  Number(yVal).toFixed(2) + ' ' +
-                  Analysis.OXIDE_NAME_DISPLAY[this.oxide1]
-              }
-              rt += '<br><span style="color:yellow">' +
-                Number(mydata[i].analysis.umfAnalysis.SiO2Al2O3Ratio).toFixed(2) +
-                '</span> SiO<sub>2</sub>:Al<sub>2</sub>O<sub>3</sub>' +
-                '<br><span style="color:yellow">' +
-                Number(mydata[i].analysis.umfAnalysis.R2OTotal).toFixed(2) + ':' +
-                Number(mydata[i].analysis.umfAnalysis.ROTotal).toFixed(2) +
-                '</span> R<sub>2</sub>O:RO'
-
-              filtereddata.text[currentLength] = rt
-              filtereddata.customdata[currentLength] = mydata[i].id
-              filtereddata.marker.color[currentLength] =
-                this.getR2OFillColor(mydata[i].analysis.umfAnalysis.R2OTotal)
-            }
+          var rt = ''
+          var cones = this.getConeString(mydata[i].fromOrtonConeId, mydata[i].toOrtonConeId, false)
+          if (cones) {
+            rt += cones + ' '
           }
+          rt += mydata[i].name
+          if (mydata[i].materialTypeId &&
+            mydata[i].materialTypeId in this.constants.GLAZE_TYPES) {
+            rt += '<br><span style="color:#cccccc">' +
+              this.constants.GLAZE_TYPES[mydata[i].materialTypeId] +
+              '</span>'
+          }
+          rt += '<br>'
+          if (this.isThreeAxis) {
+            rt += Number(xVal).toFixed(2) +
+              ' ' + Analysis.OXIDE_NAME_DISPLAY[this.oxide3] + ' ' +
+              Number(zVal).toFixed(2) + ' ' +
+              Analysis.OXIDE_NAME_DISPLAY[this.oxide1] + ' ' +
+              Number(yVal).toFixed(2) + ' ' +
+              Analysis.OXIDE_NAME_DISPLAY[this.oxide2]
+          } else {
+            rt += Number(xVal).toFixed(2) +
+              ' ' + Analysis.OXIDE_NAME_DISPLAY[this.oxide2] + ' ' +
+              Number(yVal).toFixed(2) + ' ' +
+              Analysis.OXIDE_NAME_DISPLAY[this.oxide1]
+          }
+          rt += '<br><span style="color:yellow">' +
+            Number(mydata[i].analysis.umfAnalysis.SiO2Al2O3Ratio).toFixed(2) +
+            '</span> SiO<sub>2</sub>:Al<sub>2</sub>O<sub>3</sub>' +
+            '<br><span style="color:yellow">' +
+            Number(mydata[i].analysis.umfAnalysis.R2OTotal).toFixed(2) + ':' +
+            Number(mydata[i].analysis.umfAnalysis.ROTotal).toFixed(2) +
+            '</span> R<sub>2</sub>O:RO'
+
+          filtereddata.text[currentLength] = rt
+          filtereddata.customdata[currentLength] = mydata[i].id
+          filtereddata.marker.color[currentLength] =
+            this.getR2OFillColor(mydata[i].analysis.umfAnalysis.R2OTotal)
         }
 
         console.log('Number of Recipes: ' + filtereddata.x.length)
@@ -299,7 +307,10 @@
         if (isNew) {
           Plotly.newPlot('stull-chart-d3', data, this.get3DLayout())
           this.myPlot.on('plotly_click', function (data) {
-            console.log('Clicked: ')
+            if (data.points && data.points[0].customdata) {
+              var url = 'https://glazy.org/recipes/' + data.points[0].customdata
+              window.open(url, '_blank')
+            }
           })
         } else {
           Plotly.update('stull-chart-d3', data, this.get3DLayout())
