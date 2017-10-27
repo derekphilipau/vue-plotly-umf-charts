@@ -93,7 +93,20 @@
         minWidth: 300,
         minHeight: 200,
         constants: new GlazyConstants(),
-        minSearchTextLength: 3
+        minSearchTextLength: 3,
+        defaultPlotlyConfiguration: {
+          modeBarButtonsToRemove: [
+            'sendDataToCloud',
+            'lasso2d',
+            'toggleSpikelines',
+            'hoverClosestCartesian',
+            'hoverCompareCartesian',
+            'hoverClosest3d',
+            'resetCameraLastSave3d'
+          ],
+          displaylogo: false,
+          showTips: true
+        }
       }
     },
     mounted () {
@@ -305,7 +318,8 @@
       plotly3DChart: function (isNew = false) {
         var data = [this.filtereddata]
         if (isNew) {
-          Plotly.newPlot('stull-chart-d3', data, this.get3DLayout())
+          Plotly.newPlot('stull-chart-d3', data, this.get3DLayout(), this.defaultPlotlyConfiguration)
+
           this.myPlot.on('plotly_click', function (data) {
             if (data.points && data.points[0].customdata) {
               var url = 'https://glazy.org/recipes/' + data.points[0].customdata
@@ -319,7 +333,7 @@
       plotly2DChart: function (isNew = false) {
         var data = [this.filtereddata]
         if (isNew) {
-          Plotly.newPlot('stull-chart-d3', data, this.get2DLayout())
+          Plotly.newPlot('stull-chart-d3', data, this.get2DLayout(), this.defaultPlotlyConfiguration)
           this.myPlot.on('plotly_click', function (data) {
             if (data.points && data.points[0].customdata) {
               var url = 'https://glazy.org/recipes/' + data.points[0].customdata
