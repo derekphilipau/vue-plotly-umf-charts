@@ -78,10 +78,6 @@
         type: Boolean,
         default: true
       },
-      showStullHeatmap: {
-        type: Boolean,
-        default: true
-      },
       showCones: {
         type: Boolean,
         default: true
@@ -93,6 +89,7 @@
     },
     data () {
       return {
+        myPlot: null,
         minWidth: 300,
         minHeight: 200,
         constants: new GlazyConstants(),
@@ -100,10 +97,12 @@
       }
     },
     mounted () {
+      this.myPlot = document.getElementById('stull-chart-d3')
+
       if (this.isThreeAxes) {
-        this.plotly3DChart()
+        this.plotly3DChart(true)
       } else {
-        this.plotly2DChart()
+        this.plotly2DChart(true)
       }
     },
     watch: {
@@ -126,7 +125,10 @@
         this.reset()
       },
       isThreeAxes: function (newValue) {
-        this.reset()
+        this.reset(true)
+      },
+      showStullChart: function (newValue) {
+        this.reset(true)
       }
     },
     computed: {
@@ -160,7 +162,8 @@
             y: [],
             z: [],
             name: [],
-            text: []
+            text: [],
+            customdata: []
           }
         } else {
           filtereddata = {
@@ -176,7 +179,8 @@
             y: [],
             z: [],
             name: [],
-            text: []
+            text: [],
+            customdata: []
           }
         }
         for (var i = 0; i < mylen; i++) {
@@ -200,8 +204,42 @@
               filtereddata.y[currentLength] = yVal
               filtereddata.z[currentLength] = zVal
 
+              var rt = ''
               var cones = this.getConeString(mydata[i].fromOrtonConeId, mydata[i].toOrtonConeId, false)
-              filtereddata.text[currentLength] = cones + ' ' + mydata[i].name
+              if (cones) {
+                rt += cones + ' '
+              }
+              rt += mydata[i].name
+              if (mydata[i].materialTypeId &&
+                mydata[i].materialTypeId in this.constants.GLAZE_TYPES) {
+                rt += '<br><span style="color:#cccccc">' +
+                  this.constants.GLAZE_TYPES[mydata[i].materialTypeId] +
+                  '</span>'
+              }
+              rt += '<br>'
+              if (this.isThreeAxis) {
+                rt += Number(xVal).toFixed(2) +
+                  ' ' + Analysis.OXIDE_NAME_DISPLAY[this.oxide3] + ' ' +
+                  Number(zVal).toFixed(2) + ' ' +
+                  Analysis.OXIDE_NAME_DISPLAY[this.oxide1] + ' ' +
+                  Number(yVal).toFixed(2) + ' ' +
+                  Analysis.OXIDE_NAME_DISPLAY[this.oxide2]
+              } else {
+                rt += Number(xVal).toFixed(2) +
+                  ' ' + Analysis.OXIDE_NAME_DISPLAY[this.oxide2] + ' ' +
+                  Number(yVal).toFixed(2) + ' ' +
+                  Analysis.OXIDE_NAME_DISPLAY[this.oxide1]
+              }
+              rt += '<br><span style="color:yellow">' +
+                Number(mydata[i].analysis.umfAnalysis.SiO2Al2O3Ratio).toFixed(2) +
+                '</span> SiO<sub>2</sub>:Al<sub>2</sub>O<sub>3</sub>' +
+                '<br><span style="color:yellow">' +
+                Number(mydata[i].analysis.umfAnalysis.R2OTotal).toFixed(2) + ':' +
+                Number(mydata[i].analysis.umfAnalysis.ROTotal).toFixed(2) +
+                '</span> R<sub>2</sub>O:RO'
+
+              filtereddata.text[currentLength] = rt
+              filtereddata.customdata[currentLength] = mydata[i].id
               filtereddata.marker.color[currentLength] =
                 this.getR2OFillColor(mydata[i].analysis.umfAnalysis.R2OTotal)
             }
@@ -214,13 +252,30 @@
       }
     },
     methods: {
-      plotly3DChart: function () {
+      plotly3DChart: function (isNew = false) {
         var data = [this.filtereddata]
-        Plotly.newPlot('stull-chart-d3', data, this.get3DLayout())
+        if (isNew) {
+          Plotly.newPlot('stull-chart-d3', data, this.get3DLayout())
+          this.myPlot.on('plotly_click', function (data) {
+            console.log('Clicked: ')
+          })
+        } else {
+          Plotly.update('stull-chart-d3', data, this.get3DLayout())
+        }
       },
-      plotly2DChart: function () {
+      plotly2DChart: function (isNew = false) {
         var data = [this.filtereddata]
-        Plotly.newPlot('stull-chart-d3', data, this.get2DLayout())
+        if (isNew) {
+          Plotly.newPlot('stull-chart-d3', data, this.get2DLayout())
+          this.myPlot.on('plotly_click', function (data) {
+            if (data.points && data.points[0].customdata) {
+              var url = 'https://glazy.org/recipes/' + data.points[0].customdata
+              window.open(url, '_blank')
+            }
+          })
+        } else {
+          Plotly.update('stull-chart-d3', data, this.get2DLayout())
+        }
       },
       get3DLayout: function () {
         var layout = {
@@ -252,18 +307,57 @@
       get2DLayout: function () {
         var layout = {
           hovermode: 'closest',
-          xaxis: {
-          },
-          yaxis: {
-          },
           title: 'Data Labels Hover',
           margin: {
-            l: 0,
+            l: 26,
             r: 0,
-            b: 0,
+            b: 26,
             t: 0
           },
-          shapes: [
+          xaxis: {
+            title: Analysis.OXIDE_NAME_UNICODE[this.oxide2],
+            titlefont: {
+              family: 'Arial, sans-serif',
+              size: 18,
+              color: '#999999'
+            },
+            showticklabels: true,
+            tickangle: 45,
+            tickfont: {
+              family: 'Arial, sans-serif',
+              size: 12,
+              color: '#999999'
+            },
+            autotick: true,
+            ticks: 'inside',
+            tick0: 0,
+            ticklen: 0,
+            tickwidth: 0
+          },
+          yaxis: {
+            title: Analysis.OXIDE_NAME_UNICODE[this.oxide1],
+            titlefont: {
+              family: 'Arial, sans-serif',
+              size: 18,
+              color: '#999999'
+            },
+            showticklabels: true,
+            tickangle: 45,
+            tickfont: {
+              family: 'Arial, sans-serif',
+              size: 12,
+              color: '#999999'
+            },
+            autotick: true,
+            ticks: 'inside',
+            tick0: 0,
+            ticklen: 0,
+            tickwidth: 0
+          }
+        }
+
+        if (this.showStullChart) {
+          layout.shapes = [
             // Stull Unfused
             {
               type: 'path',
@@ -332,15 +426,58 @@
               }
             }
           ]
+
+          layout.annotations = [
+            {
+              x: 1.9,
+              y: 0.95,
+              xref: 'x',
+              yref: 'y',
+              text: 'UNFUSED',
+              showarrow: false
+            },
+            {
+              x: 3.1,
+              y: 0.95,
+              xref: 'x',
+              yref: 'y',
+              text: 'MATTE',
+              showarrow: false
+            },
+            {
+              x: 4.3,
+              y: 0.95,
+              xref: 'x',
+              yref: 'y',
+              text: 'SEMI-MATTE',
+              showarrow: false
+            },
+            {
+              x: 4.3,
+              y: 0.2,
+              xref: 'x',
+              yref: 'y',
+              text: 'UNDERFIRED',
+              showarrow: false
+            },
+            {
+              x: 1.8,
+              y: 0.2,
+              xref: 'x',
+              yref: 'y',
+              text: 'CRAZED',
+              showarrow: false
+            }
+          ]
         }
 
         return layout
       },
-      reset: function () {
+      reset: function (isNew = false) {
         if (this.isThreeAxes) {
-          this.plotly3DChart()
+          this.plotly3DChart(isNew)
         } else {
-          this.plotly2DChart()
+          this.plotly2DChart(isNew)
         }
       },
       clickedrecipe: function (d) {

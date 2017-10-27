@@ -18,9 +18,7 @@
                   :colortype="this.form.colortype"
                   :showRecipes="this.form.showrecipes"
                   :showCones="this.form.conecheck"
-                  :showStullHeatmap="this.form.showstullheatmap"
-                  :showStullChart="this.form.showstullchart"
-                  :showZoomButtons="true"
+                  :showStullChart="this.form.showStullChart"
           >
           </umf-plotly>
         </div>
@@ -53,7 +51,7 @@
             </b-select>
           </b-field>
 
-          <b-field id="oxide3" v-if="this.form.isThreeAxes">
+          <b-field id="oxide3" v-if="form.isThreeAxes">
             <b-select v-model="form.oxide3">
               <option
                       v-for="option in oxides"
@@ -79,6 +77,11 @@
         <div class="field is-horizontal">
           <b-checkbox v-model="form.isThreeAxes">
             3-Axis 3D
+          </b-checkbox>
+        </div>
+        <div class="field is-horizontal" v-if="!form.isThreeAxes">
+          <b-checkbox v-model="form.showStullChart">
+            Show Stull Regions
           </b-checkbox>
         </div>
       </div>
@@ -143,8 +146,7 @@ export default {
       minSearchTextLength: 3,
       form: {
         conecheck: false,
-        showstullheatmap: false,
-        showstullchart: true,
+        showStullChart: true,
         showrecipes: true,
         glazetype: 0,
         colortype: 'r2o',
@@ -153,7 +155,7 @@ export default {
         oxide2: 'SiO2',
         oxide1: 'Al2O3',
         nozeros: false,
-        isThreeAxes: true
+        isThreeAxes: false
       },
       oxides: Analysis.OXIDE_NAME_UNICODE_SELECT,
       glazetypes: new GlazyConstants().GLAZE_TYPES_SELECT,
@@ -193,8 +195,7 @@ export default {
     resetForm: function () {
       this.form.conecheck = false
       this.form.showrecipes = true
-      this.form.showstullheatmap = false
-      this.form.showstullchart = true
+      this.form.showStullChart = true
       this.form.glazetype = 0
       this.form.cone = null
       this.form.oxide1 = Analysis.OXIDE_NAME.Al2O3
