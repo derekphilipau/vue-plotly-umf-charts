@@ -121,6 +121,12 @@
       oxide1: function (newValue) {
         this.reset()
       },
+      glazeType: function (newValue) {
+        this.reset(true)
+      },
+      search: function (newValue) {
+        this.reset(true)
+      },
       nozeros: function (newValue) {
         this.reset()
       },
@@ -148,6 +154,8 @@
 
         var mylen = mydata.length
         var filtereddata = {}
+        var matrix = [] // Keep track of collisions
+
         if (this.isThreeAxes) {
           filtereddata = {
             type: 'scatter3d',
@@ -183,7 +191,32 @@
             customdata: []
           }
         }
+
+        var glazeTypeBranch = []
+        if (this.glazeType) {
+          if (this.constants.GLAZE_TYPE_TREE[this.glazeType] !== 'undefined') {
+            glazeTypeBranch = this.constants.GLAZE_TYPE_TREE[this.glazeType]
+          }
+        }
+
+        var searchString = null
+        if (this.search && this.search.length >= this.minSearchTextLength) {
+          searchString = this.search.toLowerCase()
+        }
+
         for (var i = 0; i < mylen; i++) {
+          if (glazeTypeBranch.length > 0) {
+            if (glazeTypeBranch.indexOf(mydata[i].materialTypeId) < 0) {
+              continue
+            }
+          }
+          if (searchString) {
+            if ((!mydata[i].name || mydata[i].name === undefined) ||
+              mydata[i].name.toLowerCase().indexOf(searchString) === -1) {
+              continue
+            }
+          }
+
           var xVal = 0.0
           var yVal = 0.0
           var zVal = 0.0
@@ -194,6 +227,15 @@
           } else {
             xVal = parseFloat(mydata[i].analysis.umfAnalysis[this.oxide2])
             yVal = parseFloat(mydata[i].analysis.umfAnalysis[this.oxide1])
+            // Adjust coordinates using stacked collision
+            var point = xVal.toFixed(2) + ':' + yVal.toFixed(2)
+            if (point in matrix) {
+              xVal += matrix[point] / 2
+              yVal += matrix[point]
+              matrix[point] += 0.001
+            } else {
+              matrix[point] = 0
+            }
           }
 
           // Check data for any recipes lacking information

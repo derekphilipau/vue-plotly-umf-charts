@@ -16,6 +16,8 @@
                   :nozeros="this.form.nozeros"
                   :isThreeAxes="this.form.isThreeAxes"
                   :colortype="this.form.colortype"
+                  :glazeType="this.form.glazeType"
+                  :search="this.search"
                   :showRecipes="this.form.showrecipes"
                   :showCones="this.form.conecheck"
                   :showStullChart="this.form.showStullChart"
@@ -27,6 +29,26 @@
     <div class="columns">
       <div class="column">
         <div class="field is-horizontal">
+
+          <b-field id="searchInput">
+            <b-input v-model="textComputed"
+                     placeholder="Keyword"></b-input>
+          </b-field>
+
+          <b-field id="glazeTypeGroup">
+            <b-select v-model="form.glazeType">
+              <option
+                      v-for="option in glazeTypes"
+                      :value="option.value"
+                      :key="option.value"
+              >
+                {{ option.text }}
+              </option>
+            </b-select>
+          </b-field>
+
+
+
           <b-field id="oxide1">
             <b-select v-model="form.oxide1">
               <option
@@ -69,7 +91,7 @@
     </div>
     <div class="columns">
       <div class="column">
-        <div class="field is-horizontal">
+        <div class="field is-horizontal"  v-if="form.isThreeAxes">
           <b-checkbox v-model="form.nozeros">
             Recipes must contain <em>ALL</em> oxides (X, Y, and Z)
           </b-checkbox>
@@ -148,7 +170,7 @@ export default {
         conecheck: false,
         showStullChart: true,
         showrecipes: true,
-        glazetype: 0,
+        glazeType: 0,
         colortype: 'r2o',
         cone: null,
         oxide3: 'Fe2O3',
@@ -158,7 +180,7 @@ export default {
         isThreeAxes: false
       },
       oxides: Analysis.OXIDE_NAME_UNICODE_SELECT,
-      glazetypes: new GlazyConstants().GLAZE_TYPES_SELECT,
+      glazeTypes: new GlazyConstants().GLAZE_TYPES_SELECT,
       cones: [
         { value: null, text: 'Temp' },
         { value: 'low', text: 'Low' },
@@ -196,7 +218,7 @@ export default {
       this.form.conecheck = false
       this.form.showrecipes = true
       this.form.showStullChart = true
-      this.form.glazetype = 0
+      this.form.glazeType = 0
       this.form.cone = null
       this.form.oxide1 = Analysis.OXIDE_NAME.Al2O3
       this.form.oxide2 = Analysis.OXIDE_NAME.SiO2
