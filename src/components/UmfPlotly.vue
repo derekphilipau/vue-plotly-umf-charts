@@ -409,7 +409,14 @@
           }
         }
 
-        if (this.showStullChart) {
+        var isSiAlAxes = true
+        if (this.oxide2 !== Analysis.OXIDE_NAME.SiO2 ||
+          this.oxide1 !== Analysis.OXIDE_NAME.Al2O3) {
+          // Do not show Si:Al map overlays
+          isSiAlAxes = false
+        }
+
+        if (this.showStullChart && isSiAlAxes) {
           layout.shapes = [
             // Stull Unfused
             {
