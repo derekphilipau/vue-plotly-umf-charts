@@ -21,6 +21,7 @@
                   :showRecipes="this.form.showrecipes"
                   :showCones="this.form.conecheck"
                   :showStullChart="this.form.showStullChart"
+                  v-on:clickedUmfPlotly="clicked"
           >
           </umf-plotly>
         </div>
@@ -107,6 +108,13 @@
           </b-checkbox>
         </div>
       </div>
+      <div class="column" v-if="clickedRecipe">
+        <article class="tile is-child notification is-info">
+          <p v-html="clickedRecipe.text"></p>
+          <a v-bind:href="'https://glazy.org/recipes/' + clickedRecipe.customdata"
+             target="_blank" class="button">View on Glazy</a>
+        </article>
+      </div>
     </div>
     <div class="columns">
       <div class="column">
@@ -145,7 +153,7 @@
 
 <script>
 import UmfPlotly from '../components/UmfPlotly'
-import StaticDataset from '../../static/data/all_api_output.edit.short.mini.json'
+import StaticDataset from '../../static/data/all_api_output.edit.mini.json'
 
 import Analysis from 'ceramicscalc-js/src/analysis/Analysis'
 import GlazyConstants from 'ceramicscalc-js/src/helpers/GlazyConstants'
@@ -165,6 +173,7 @@ export default {
       csv: null,
       selected: null,
       searchtext: '',
+      clickedRecipe: null,
       minSearchTextLength: 3,
       form: {
         conecheck: false,
@@ -225,6 +234,10 @@ export default {
       this.form.oxide2 = Analysis.OXIDE_NAME.SiO2
       this.form.oxide3 = Analysis.OXIDE_NAME.Fe2O3
       this.searchtext = ''
+    },
+    clicked: function (data) {
+      this.clickedRecipe = data
+      console.log(data)
     }
   },
   components: {

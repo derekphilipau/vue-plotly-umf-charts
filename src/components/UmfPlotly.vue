@@ -224,8 +224,8 @@
             }
           }
           if (searchString) {
-            if ((!mydata[i].n || mydata[i].n === undefined) ||
-              mydata[i].n.toLowerCase().indexOf(searchString) === -1) {
+            if ((!mydata[i].name || mydata[i].name === undefined) ||
+              mydata[i].name.toLowerCase().indexOf(searchString) === -1) {
               continue
             }
           }
@@ -234,9 +234,9 @@
           var yVal = 0.0
           var zVal = 0.0
           if (this.isThreeAxes) {
-            xVal = parseFloat(mydata[i].a.umf[Analysis.OXIDE_NAME_SHORT[this.oxide3]])
-            zVal = parseFloat(mydata[i].a.umf[Analysis.OXIDE_NAME_SHORT[this.oxide1]])
-            yVal = parseFloat(mydata[i].a.umf[Analysis.OXIDE_NAME_SHORT[this.oxide2]])
+            xVal = parseFloat(mydata[i].analysis.umfAnalysis[this.oxide3])
+            zVal = parseFloat(mydata[i].analysis.umfAnalysis[this.oxide1])
+            yVal = parseFloat(mydata[i].analysis.umfAnalysis[this.oxide2])
 
             if (isNaN(xVal)) { xVal = 0.0 }
             if (isNaN(zVal)) { zVal = 0.0 }
@@ -246,8 +246,8 @@
               continue
             }
           } else {
-            xVal = parseFloat(mydata[i].a.umf[Analysis.OXIDE_NAME_SHORT[this.oxide2]])
-            yVal = parseFloat(mydata[i].a.umf[Analysis.OXIDE_NAME_SHORT[this.oxide1]])
+            xVal = parseFloat(mydata[i].analysis.umfAnalysis[this.oxide2])
+            yVal = parseFloat(mydata[i].analysis.umfAnalysis[this.oxide1])
 
             if (isNaN(xVal) || isNaN(yVal)) {
               continue
@@ -273,7 +273,7 @@
           if (cones) {
             rt += cones + ' '
           }
-          rt += mydata[i].n
+          rt += mydata[i].name
           if (mydata[i].mti &&
             mydata[i].mti in this.constants.GLAZE_TYPES) {
             rt += '<br><span style="color:#cccccc">' +
@@ -295,17 +295,17 @@
               Analysis.OXIDE_NAME_DISPLAY[this.oxide1]
           }
           rt += '<br><span style="color:yellow">' +
-            Number(mydata[i].a.umf.SiAl).toFixed(2) +
+            Number(mydata[i].analysis.umfAnalysis.SiO2Al2O3Ratio).toFixed(2) +
             '</span> SiO<sub>2</sub>:Al<sub>2</sub>O<sub>3</sub>' +
             '<br><span style="color:yellow">' +
-            Number(mydata[i].a.umf.R2O).toFixed(2) + ':' +
-            Number(mydata[i].a.umf.RO).toFixed(2) +
+            Number(mydata[i].analysis.umfAnalysis.R2OTotal).toFixed(2) + ':' +
+            Number(mydata[i].analysis.umfAnalysis.ROTotal).toFixed(2) +
             '</span> R<sub>2</sub>O:RO'
 
           filtereddata.text[currentLength] = rt
           filtereddata.customdata[currentLength] = mydata[i].id
           filtereddata.marker.color[currentLength] =
-            this.getR2OFillColor(mydata[i].a.umf.R2O)
+            this.getR2OFillColor(mydata[i].analysis.umfAnalysis.R2OTotal)
         }
 
         console.log('Number of Recipes: ' + filtereddata.x.length)
@@ -321,10 +321,9 @@
 
           this.myPlot.on('plotly_click', function (data) {
             if (data.points && data.points[0].customdata) {
-              var url = 'https://glazy.org/recipes/' + data.points[0].customdata
-              window.open(url, '_blank')
+              this.$emit('clickedUmfPlotly', data.points[0])
             }
-          })
+          }.bind(this))
         } else {
           Plotly.update('stull-chart-d3', data, this.get3DLayout())
         }
@@ -335,10 +334,9 @@
           Plotly.newPlot('stull-chart-d3', data, this.get2DLayout(), this.defaultPlotlyConfiguration)
           this.myPlot.on('plotly_click', function (data) {
             if (data.points && data.points[0].customdata) {
-              var url = 'https://glazy.org/recipes/' + data.points[0].customdata
-              window.open(url, '_blank')
+              this.$emit('clickedUmfPlotly', data.points[0])
             }
-          })
+          }.bind(this))
         } else {
           Plotly.update('stull-chart-d3', data, this.get2DLayout())
         }
@@ -551,12 +549,6 @@
           this.plotly3DChart(isNew)
         } else {
           this.plotly2DChart(isNew)
-        }
-      },
-      clickedrecipe: function (d) {
-        if (d.id) {
-          var url = 'https://glazy.org/recipes/' + d.id
-          window.open(url, '_blank')
         }
       },
       getR2OFillColor: function (r2oTotal) {
