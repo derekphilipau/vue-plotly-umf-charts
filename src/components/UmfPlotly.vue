@@ -120,7 +120,7 @@
     },
     watch: {
       recipeData: function (newValue) {
-        this.reset()
+        this.reset(true)
       },
       extraRegions: function (newValue) {
         this.reset()
