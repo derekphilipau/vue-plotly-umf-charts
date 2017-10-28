@@ -85,13 +85,15 @@
       showZoomButtons: {
         type: Boolean,
         default: false
+      },
+      chartHeight: {
+        type: Number,
+        default: 200
       }
     },
     data () {
       return {
         myPlot: null,
-        minWidth: 300,
-        minHeight: 200,
         constants: new GlazyConstants(),
         minSearchTextLength: 3,
         defaultPlotlyConfiguration: {
@@ -364,7 +366,8 @@
             r: 0,
             b: 0,
             t: 0
-          }
+          },
+          height: this.chartHeight
         }
         return layout
       },
@@ -378,6 +381,7 @@
             b: 26,
             t: 0
           },
+          height: this.chartHeight,
           xaxis: {
             title: Analysis.OXIDE_NAME_UNICODE[this.oxide2],
             titlefont: {

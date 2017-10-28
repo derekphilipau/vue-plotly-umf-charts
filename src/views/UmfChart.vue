@@ -21,6 +21,7 @@
                   :showRecipes="this.form.showrecipes"
                   :showCones="this.form.conecheck"
                   :showStullChart="this.form.showStullChart"
+                  :chartHeight="400"
                   v-on:clickedUmfPlotly="clicked"
           >
           </umf-plotly>
