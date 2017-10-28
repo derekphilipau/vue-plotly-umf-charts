@@ -221,7 +221,7 @@
 
         for (var i = 0; i < mylen; i++) {
           if (glazeTypeBranch.length > 0) {
-            if (glazeTypeBranch.indexOf(mydata[i].mti) < 0) {
+            if (glazeTypeBranch.indexOf(mydata[i].materialTypeId) < 0) {
               continue
             }
           }
@@ -276,10 +276,10 @@
             rt += cones + ' '
           }
           rt += mydata[i].name
-          if (mydata[i].mti &&
-            mydata[i].mti in this.constants.GLAZE_TYPES) {
+          if (mydata[i].materialTypeId &&
+            mydata[i].materialTypeId in this.constants.GLAZE_TYPES) {
             rt += '<br><span style="color:#cccccc">' +
-              this.constants.GLAZE_TYPES[mydata[i].mti] +
+              this.constants.GLAZE_TYPES[mydata[i].materialTypeId] +
               '</span>'
           }
           rt += '<br>'
