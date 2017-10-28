@@ -376,9 +376,9 @@
           hovermode: 'closest',
           title: 'Data Labels Hover',
           margin: {
-            l: 26,
+            l: 40,
             r: 0,
-            b: 26,
+            b: 30,
             t: 0
           },
           height: this.chartHeight,
@@ -386,14 +386,14 @@
             title: Analysis.OXIDE_NAME_UNICODE[this.oxide2],
             titlefont: {
               family: 'Arial, sans-serif',
-              size: 18,
+              size: 14,
               color: '#999999'
             },
             showticklabels: true,
-            tickangle: 45,
+            tickangle: 0,
             tickfont: {
               family: 'Arial, sans-serif',
-              size: 12,
+              size: 10,
               color: '#999999'
             },
             autotick: true,
@@ -406,14 +406,14 @@
             title: Analysis.OXIDE_NAME_UNICODE[this.oxide1],
             titlefont: {
               family: 'Arial, sans-serif',
-              size: 18,
+              size: 14,
               color: '#999999'
             },
             showticklabels: true,
-            tickangle: 45,
+            tickangle: 0,
             tickfont: {
               family: 'Arial, sans-serif',
-              size: 12,
+              size: 10,
               color: '#999999'
             },
             autotick: true,
