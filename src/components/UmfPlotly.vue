@@ -86,6 +86,10 @@
         type: Boolean,
         default: false
       },
+      chartWidth: {
+        type: Number,
+        default: 200
+      },
       chartHeight: {
         type: Number,
         default: 200
@@ -150,6 +154,12 @@
       },
       showStullChart: function (newValue) {
         this.reset(true)
+      },
+      chartWidth: function (newValue) {
+        Plotly.relayout('stull-chart-d3', { width: this.chartWidth, height: this.chartHeight })
+      },
+      chartHeight: function (newValue) {
+        Plotly.relayout('stull-chart-d3', { width: this.chartWidth, height: this.chartHeight })
       }
     },
     computed: {

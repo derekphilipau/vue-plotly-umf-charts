@@ -21,7 +21,8 @@
                   :showRecipes="this.form.showrecipes"
                   :showCones="this.form.conecheck"
                   :showStullChart="this.form.showStullChart"
-                  :chartHeight="400"
+                  :chartHeight="chartHeight"
+                  :chartWidth="chartWidth"
                   v-on:clickedUmfPlotly="clicked"
           >
           </umf-plotly>
@@ -176,6 +177,8 @@ export default {
       searchtext: '',
       clickedRecipe: null,
       minSearchTextLength: 3,
+      chartHeight: 400,
+      chartWidth: 300,
       form: {
         conecheck: false,
         showStullChart: true,
@@ -206,6 +209,9 @@ export default {
     }
   },
   mounted () {
+    this.chartHeight = document.getElementById('stull-chart-d3').clientHeight
+    this.chartWidth = document.getElementById('stull-chart-d3').clientWidth
+    window.addEventListener('resize', this.handleResize)
   },
   computed: {
     textComputed: {
@@ -239,6 +245,10 @@ export default {
     clicked: function (data) {
       this.clickedRecipe = data
       console.log(data)
+    },
+    handleResize: function () {
+      this.chartHeight = document.getElementById('stull-chart-d3').clientHeight
+      this.chartWidth = document.getElementById('stull-chart-d3').clientWidth
     }
   },
   components: {
