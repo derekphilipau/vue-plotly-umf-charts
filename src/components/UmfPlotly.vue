@@ -70,6 +70,14 @@
         type: Boolean,
         default: true
       },
+      axesColor: {
+        type: String,
+        default: '#999999'
+      },
+      gridColor: {
+        type: String,
+        default: '#999999'
+      },
       showRecipes: {
         type: Boolean,
         default: true
@@ -356,9 +364,27 @@
       get3DLayout: function () {
         var layout = {
           scene: {
-            xaxis: {title: this.oxide3},
-            yaxis: {title: this.oxide2},
-            zaxis: {title: this.oxide1},
+            xaxis: {
+              title: this.oxide3,
+              gridcolor: this.gridColor,
+              gridwidth: 1,
+              zerolinecolor: this.gridColor,
+              zerolinewidth: 1
+            },
+            yaxis: {
+              title: this.oxide2,
+              gridcolor: this.gridColor,
+              gridwidth: 1,
+              zerolinecolor: this.gridColor,
+              zerolinewidth: 1
+            },
+            zaxis: {
+              title: this.oxide1,
+              gridcolor: this.gridColor,
+              gridwidth: 1,
+              zerolinecolor: this.gridColor,
+              zerolinewidth: 1
+            },
             aspectratio: {
               x: 0.5, y: 3, z: 0.8
             },
@@ -377,6 +403,8 @@
             b: 0,
             t: 0
           },
+          paper_bgcolor: 'rgba(0,0,0,0)',
+          plot_bgcolor: 'rgba(0,0,0,0)',
           height: this.chartHeight
         }
         return layout
@@ -391,21 +419,27 @@
             b: 30,
             t: 0
           },
+          paper_bgcolor: 'rgba(0,0,0,0)',
+          plot_bgcolor: 'rgba(0,0,0,0)',
           height: this.chartHeight,
           xaxis: {
             title: Analysis.OXIDE_NAME_UNICODE[this.oxide2],
             titlefont: {
               family: 'Arial, sans-serif',
               size: 14,
-              color: '#999999'
+              color: this.axesColor
             },
             showticklabels: true,
             tickangle: 0,
             tickfont: {
               family: 'Arial, sans-serif',
               size: 10,
-              color: '#999999'
+              color: this.axesColor
             },
+            gridcolor: this.gridColor,
+            gridwidth: 1,
+            zerolinecolor: this.gridColor,
+            zerolinewidth: 1,
             autotick: true,
             ticks: 'inside',
             tick0: 0,
@@ -417,15 +451,19 @@
             titlefont: {
               family: 'Arial, sans-serif',
               size: 14,
-              color: '#999999'
+              color: this.axesColor
             },
             showticklabels: true,
             tickangle: 0,
             tickfont: {
               family: 'Arial, sans-serif',
               size: 10,
-              color: '#999999'
+              color: this.axesColor
             },
+            gridcolor: this.gridColor,
+            gridwidth: 1,
+            zerolinecolor: this.gridColor,
+            zerolinewidth: 1,
             autotick: true,
             ticks: 'inside',
             tick0: 0,

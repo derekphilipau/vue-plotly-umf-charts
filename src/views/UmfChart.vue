@@ -23,6 +23,8 @@
                   :showStullChart="this.form.showStullChart"
                   :chartHeight="chartHeight"
                   :chartWidth="chartWidth"
+                  :axesColor="'#000000'"
+                  :gridColor="'#999999'"
                   v-on:clickedUmfPlotly="clicked"
           >
           </umf-plotly>
@@ -320,7 +322,7 @@ export default {
     line-height: 1em;
     padding: .2em;
     width: 2.5em;
-    border: 1px solid white;
+    margin: 1px;
     text-align: center;
   }
   .r2o-colors tr td.label {
