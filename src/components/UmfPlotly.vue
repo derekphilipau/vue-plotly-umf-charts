@@ -4,6 +4,7 @@
   import Plotly from 'plotly.js/dist/plotly'
 
   import Analysis from 'ceramicscalc-js/src/analysis/Analysis'
+  import MaterialTypes from 'ceramicscalc-js/src/material/MaterialTypes'
   import GlazyConstants from 'ceramicscalc-js/src/helpers/GlazyConstants'
 
   export default {
@@ -107,6 +108,7 @@
       return {
         myPlot: null,
         constants: new GlazyConstants(),
+        materialTypes: new MaterialTypes(),
         minSearchTextLength: 3,
         defaultPlotlyConfiguration: {
           modeBarButtonsToRemove: [
@@ -227,8 +229,8 @@
 
         var glazeTypeBranch = []
         if (this.glazeType) {
-          if (this.constants.GLAZE_TYPE_TREE[this.glazeType] !== 'undefined') {
-            glazeTypeBranch = this.constants.GLAZE_TYPE_TREE[this.glazeType]
+          if (this.materialTypes.GLAZE_TYPE_TREE[this.glazeType] !== 'undefined') {
+            glazeTypeBranch = this.materialTypes.GLAZE_TYPE_TREE[this.glazeType]
           }
         }
 
@@ -295,9 +297,9 @@
           }
           rt += mydata[i].name
           if (mydata[i].materialTypeId &&
-            mydata[i].materialTypeId in this.constants.GLAZE_TYPES) {
+              this.materialTypes.LOOKUP[mydata[i].materialTypeId]) {
             rt += '<br><span style="color:#cccccc">' +
-              this.constants.GLAZE_TYPES[mydata[i].materialTypeId] +
+              this.materialTypes.LOOKUP[mydata[i].materialTypeId] +
               '</span>'
           }
           rt += '<br>'

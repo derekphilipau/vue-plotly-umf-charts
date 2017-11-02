@@ -160,8 +160,8 @@ import UmfPlotly from '../components/UmfPlotly'
 import StaticDataset from '../../static/data/all_api_output.edit.mini.json'
 
 import Analysis from 'ceramicscalc-js/src/analysis/Analysis'
+import MaterialTypes from 'ceramicscalc-js/src/material/MaterialTypes'
 import GlazyConstants from 'ceramicscalc-js/src/helpers/GlazyConstants'
-import OrtonCones from 'ceramicscalc-js/src/helpers/OrtonCones'
 
 import _ from 'lodash'
 
@@ -195,13 +195,8 @@ export default {
         isThreeAxes: false
       },
       oxides: Analysis.OXIDE_NAME_UNICODE_SELECT,
-      glazeTypes: new GlazyConstants().GLAZE_TYPES_SELECT,
-      cones: [
-        { value: null, text: 'Temp' },
-        { value: 'low', text: 'Low' },
-        { value: 'mid', text: 'Mid' },
-        { value: 'high', text: 'High' }
-      ].concat(new OrtonCones().DISPLAY_CONES),
+      glazeTypes: new MaterialTypes().GLAZES_SELECT,
+      cones: new GlazyConstants().ORTON_CONES_SELECT,
       colortypes: [
         { text: 'R2O:RO', value: 'r2o' },
         { text: 'Orton Cone', value: 'cone' },
