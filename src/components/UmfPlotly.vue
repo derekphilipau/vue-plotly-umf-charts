@@ -22,7 +22,11 @@
         type: String,
         default: null
       },
-      glazeType: {
+      materialTypeId: {
+        type: Number,
+        default: null
+      },
+      baseTypeId: {
         type: Number,
         default: null
       },
@@ -49,6 +53,10 @@
       isThreeAxes: {
         type: Boolean,
         default: false
+      },
+      highlightedRecipeId: {
+        type: Number,
+        default: 0
       },
       margin: {
         type: Object,
@@ -110,6 +118,8 @@
         constants: new GlazyConstants(),
         materialTypes: new MaterialTypes(),
         minSearchTextLength: 3,
+        defaultMarkerSize: 8,
+        highlightedMarkerSize: 12,
         defaultPlotlyConfiguration: {
           modeBarButtonsToRemove: [
             'sendDataToCloud',
@@ -150,7 +160,7 @@
       oxide1: function (newValue) {
         this.reset(true)
       },
-      glazeType: function (newValue) {
+      materialTypeId: function (newValue) {
         this.reset(true)
       },
       search: function (newValue) {
@@ -170,6 +180,9 @@
       },
       chartHeight: function (newValue) {
         Plotly.relayout('stull-chart-d3', { width: this.chartWidth, height: this.chartHeight })
+      },
+      highlightedRecipeId: function (newValue) {
+        this.highlightRecipe()
       }
     },
     computed: {
@@ -197,13 +210,16 @@
             mode: 'markers',
             marker: {
               color: [],
-              size: 4,
+              size: [],
               opacity: 0.5
             },
             hoverinfo: 'text',
             x: [],
             y: [],
             z: [],
+            limitx: 0,
+            limity: 0,
+            limitz: 0,
             name: [],
             text: [],
             customdata: []
@@ -214,23 +230,27 @@
             mode: 'markers',
             marker: {
               color: [],
-              size: 8,
+              size: [],
               opacity: 0.5
             },
             hoverinfo: 'text',
             x: [],
             y: [],
             z: [],
+            limitx: 0,
+            limity: 0,
+            limitz: 0,
             name: [],
             text: [],
             customdata: []
           }
         }
 
-        var glazeTypeBranch = []
-        if (this.glazeType) {
-          if (this.materialTypes.GLAZE_TYPE_TREE[this.glazeType] !== 'undefined') {
-            glazeTypeBranch = this.materialTypes.GLAZE_TYPE_TREE[this.glazeType]
+        var materialTypeBranch = []
+        if (this.materialTypeId &&
+          this.baseTypeId === this.materialTypes.GLAZE_TYPE_ID) {
+          if (this.materialTypes.GLAZE_TYPE_TREE[this.materialTypeId] !== 'undefined') {
+            materialTypeBranch = this.materialTypes.GLAZE_TYPE_TREE[this.materialTypeId]
           }
         }
 
@@ -240,8 +260,8 @@
         }
 
         for (var i = 0; i < mylen; i++) {
-          if (glazeTypeBranch.length > 0) {
-            if (glazeTypeBranch.indexOf(mydata[i].materialTypeId) < 0) {
+          if (materialTypeBranch.length > 0) {
+            if (materialTypeBranch.indexOf(mydata[i].materialTypeId) < 0) {
               continue
             }
           }
@@ -290,33 +310,51 @@
           filtereddata.y[currentLength] = yVal
           filtereddata.z[currentLength] = zVal
 
-          var rt = ''
+          if (xVal > filtereddata.limitx) {
+            filtereddata.limitx = xVal
+          }
+          if (yVal > filtereddata.limity) {
+            filtereddata.limity = yVal
+          }
+          if (zVal > filtereddata.limitz) {
+            filtereddata.limitz = zVal
+          }
+
+          var tooltip = ''
           var cones = this.getConeString(mydata[i].foci, mydata[i].toci, false)
           if (cones) {
-            rt += cones + ' '
+            tooltip += cones + ' '
           }
-          rt += mydata[i].name
+
+          if (mydata[i].name) {
+            if (mydata[i].name.length > 22) {
+              tooltip += mydata[i].name.substr(0, 22) + '...'
+            } else {
+              tooltip += mydata[i].name
+            }
+          }
+
           if (mydata[i].materialTypeId &&
               this.materialTypes.LOOKUP[mydata[i].materialTypeId]) {
-            rt += '<br><span style="color:#cccccc">' +
+            tooltip += '<br><span style="color:#cccccc">' +
               this.materialTypes.LOOKUP[mydata[i].materialTypeId] +
               '</span>'
           }
-          rt += '<br>'
+          tooltip += '<br>'
           if (this.isThreeAxis) {
-            rt += Number(xVal).toFixed(2) +
+            tooltip += Number(xVal).toFixed(2) +
               ' ' + Analysis.OXIDE_NAME_DISPLAY[this.oxide3] + ' ' +
               Number(zVal).toFixed(2) + ' ' +
               Analysis.OXIDE_NAME_DISPLAY[this.oxide1] + ' ' +
               Number(yVal).toFixed(2) + ' ' +
               Analysis.OXIDE_NAME_DISPLAY[this.oxide2]
           } else {
-            rt += Number(xVal).toFixed(2) +
+            tooltip += Number(xVal).toFixed(2) +
               ' ' + Analysis.OXIDE_NAME_DISPLAY[this.oxide2] + ' ' +
               Number(yVal).toFixed(2) + ' ' +
               Analysis.OXIDE_NAME_DISPLAY[this.oxide1]
           }
-          rt += '<br><span style="color:yellow">' +
+          tooltip += '<br><span style="color:yellow">' +
             Number(mydata[i].analysis.umfAnalysis.SiO2Al2O3Ratio).toFixed(2) +
             '</span> SiO<sub>2</sub>:Al<sub>2</sub>O<sub>3</sub>' +
             '<br><span style="color:yellow">' +
@@ -324,10 +362,12 @@
             Number(mydata[i].analysis.umfAnalysis.ROTotal).toFixed(2) +
             '</span> R<sub>2</sub>O:RO'
 
-          filtereddata.text[currentLength] = rt
+          filtereddata.text[currentLength] = tooltip
           filtereddata.customdata[currentLength] = mydata[i].id
           filtereddata.marker.color[currentLength] =
             this.getR2OFillColor(mydata[i].analysis.umfAnalysis.R2OTotal)
+          filtereddata.marker.size[currentLength] =
+              this.defaultMarkerSize
         }
 
         console.log('Number of Recipes: ' + filtereddata.x.length)
@@ -353,14 +393,14 @@
       plotly2DChart: function (isNew = false) {
         var data = [this.filtereddata]
         if (isNew) {
-          Plotly.newPlot('stull-chart-d3', data, this.get2DLayout(), this.defaultPlotlyConfiguration)
+          Plotly.newPlot('stull-chart-d3', data, this.get2DLayout(data), this.defaultPlotlyConfiguration)
           this.myPlot.on('plotly_click', function (data) {
             if (data.points && data.points[0].customdata) {
               this.$emit('clickedUmfPlotly', data.points[0])
             }
           }.bind(this))
         } else {
-          Plotly.update('stull-chart-d3', data, this.get2DLayout())
+          Plotly.update('stull-chart-d3', data, this.get2DLayout(data))
         }
       },
       get3DLayout: function () {
@@ -411,10 +451,10 @@
         }
         return layout
       },
-      get2DLayout: function () {
+      get2DLayout: function (data) {
         var layout = {
           hovermode: 'closest',
-          title: 'Data Labels Hover',
+          title: 'Recipe Info',
           margin: {
             l: 40,
             r: 0,
@@ -481,7 +521,9 @@
           isSiAlAxes = false
         }
 
-        if (this.showStullChart && isSiAlAxes) {
+        if (this.showStullChart &&
+          isSiAlAxes &&
+          this.baseTypeId === this.materialTypes.GLAZE_TYPE_ID) {
           layout.shapes = [
             // Stull Unfused
             {
@@ -552,48 +594,52 @@
             }
           ]
 
-          layout.annotations = [
-            {
-              x: 1.9,
-              y: 0.95,
-              xref: 'x',
-              yref: 'y',
-              text: 'UNFUSED',
-              showarrow: false
-            },
-            {
-              x: 3.1,
-              y: 0.95,
-              xref: 'x',
-              yref: 'y',
-              text: 'MATTE',
-              showarrow: false
-            },
-            {
-              x: 4.3,
-              y: 0.95,
-              xref: 'x',
-              yref: 'y',
-              text: 'SEMI-MATTE',
-              showarrow: false
-            },
-            {
-              x: 4.3,
-              y: 0.2,
-              xref: 'x',
-              yref: 'y',
-              text: 'UNDERFIRED',
-              showarrow: false
-            },
-            {
-              x: 1.8,
-              y: 0.2,
-              xref: 'x',
-              yref: 'y',
-              text: 'CRAZED',
-              showarrow: false
-            }
-          ]
+          // Don't show Stull labels if limits are too great.
+          if (data.limitx > 10 ||
+            data.limity > 2) {
+            layout.annotations = [
+              {
+                x: 1.9,
+                y: 0.95,
+                xref: 'x',
+                yref: 'y',
+                text: 'UNFUSED',
+                showarrow: false
+              },
+              {
+                x: 3.1,
+                y: 0.95,
+                xref: 'x',
+                yref: 'y',
+                text: 'MATTE',
+                showarrow: false
+              },
+              {
+                x: 4.3,
+                y: 0.95,
+                xref: 'x',
+                yref: 'y',
+                text: 'SEMI-MATTE',
+                showarrow: false
+              },
+              {
+                x: 4.3,
+                y: 0.2,
+                xref: 'x',
+                yref: 'y',
+                text: 'UNDERFIRED',
+                showarrow: false
+              },
+              {
+                x: 1.8,
+                y: 0.2,
+                xref: 'x',
+                yref: 'y',
+                text: 'CRAZED',
+                showarrow: false
+              }
+            ]
+          }
         }
 
         return layout
@@ -668,6 +714,24 @@
       },
       round: function (value, decimals) {
         return Number(Math.round(value + 'e' + decimals) + 'e-' + decimals)
+      },
+      highlightRecipe () {
+        if (this.filtereddata.customdata &&
+          this.filtereddata.customdata.length > 0) {
+          var len = this.filtereddata.customdata.length
+          var markerSizes = []
+          for (var i = 0; i < len; i++) {
+            if (this.highlightedRecipeId &&
+              this.highlightedRecipeId === Number(this.filtereddata.customdata[i])) {
+              markerSizes[i] =
+                this.highlightedMarkerSize
+            } else {
+              markerSizes[i] =
+                this.defaultMarkerSize
+            }
+          }
+          Plotly.restyle('stull-chart-d3', 'marker.size', [markerSizes])
+        }
       }
     }
   }
@@ -675,236 +739,4 @@
 
 <style>
 
-    .zoom-buttons {
-        position: absolute;
-        right: 30px;
-        top: 30px;
-    }
-
-    .axis path,
-    .axis line {
-        fill: none;
-        stroke: rgba(0, 0, 0, 0.1);
-        shape-rendering: crispEdges;
-    }
-
-    .bar {
-        fill: orange;
-    }
-
-    .bar:hover {
-        fill: orangered ;
-    }
-
-    .x.axis path {
-        display: none;
-    }
-
-    .d3-tip {
-        font-size: .875rem;
-        line-height: 1.125rem;
-        font-weight: normal;
-        padding: .75rem;
-        background: rgba(0, 0, 0, 0.7);
-        color: #fff;
-        border-radius: 2px;
-    }
-
-    /* Creates a small triangle extender for the tooltip */
-    .d3-tip:after {
-        box-sizing: border-box;
-        display: inline;
-        font-size: 10px;
-        width: 100%;
-        line-height: 1;
-        color: rgba(0, 0, 0, 0.8);
-        content: "\25BC";
-        position: absolute;
-        text-align: center;
-    }
-
-    /* Style northward tooltips differently */
-    .d3-tip.n:after {
-        margin: -1px 0 0 0;
-        top: 100%;
-        left: 0;
-    }
-
-    .axis-names {
-        font-size: 1.25rem;
-        font-weight: 200;
-        color: rgba(0, 0, 0, 0.8);
-        -webkit-user-select: none;
-        -moz-user-select: none;
-        -ms-user-select: none;
-        user-select: none;
-    }
-    .axis-names::selection {
-        background: none;
-    }
-
-    .stull-region-unfused {
-        fill: #66ff66;
-    }
-    .stull-region-matte {
-        fill: #99ff99;
-    }
-    .stull-region-semimatte {
-        fill: #ccffcc;
-    }
-    .stull-region-underfired {
-        fill: #66ff66;
-    }
-    .stull-region-crazed {
-        fill: #dddddd;
-    }
-
-    .stull-region-names {
-        font-weight: 200;
-        -webkit-user-select: none;
-        -moz-user-select: none;
-        -ms-user-select: none;
-        user-select: none;
-    }
-    .stull-region-names::selection {
-        background: none;
-    }
-
-    .stull-temp-names {
-        font-size: .75rem;
-        font-weight: 200;
-        -webkit-user-select: none;
-        -moz-user-select: none;
-        -ms-user-select: none;
-        user-select: none;
-    }
-    .stull-temp-names::selection {
-        background: none;
-    }
-
-    .orton-cone {
-        font-size: .75rem;
-        font-weight: 200;
-    }
-
-    .glazetype460 {  fill: #ffffff;  }
-    .glazetype470 {  fill: #ffffff;  }
-    .glazetype480 {  fill: #fefef0;  }
-    .glazetype490 {  fill: #b22222;  }
-    .glazetype500 {  fill: #ace1af;  }
-    .glazetype510 {  fill: #c4d1e1;  }
-    .glazetype520 {  fill: #4b945e;  }
-    .glazetype530 {  fill: #ffdb58;  }
-    .glazetype533 {  fill: #91a2a3;  }
-    .glazetype535 {  fill: #ffbf00;  }
-    .glazetype540 {  fill: #654321;  }
-    .glazetype550 {  fill: #6c6517;  }
-    .glazetype560 {  fill: #63382f;  }
-    .glazetype570 {  fill: #9b391c;  }
-    .glazetype580 {  fill: #3d3b32;  }
-    .glazetype585 {  fill: #8e2222;  }
-    .glazetype590 {  fill: #efeee7;  }
-    .glazetype600 {  fill: #e0d7c5;  }
-    .glazetype610 {  fill: #de815b;  }
-    .glazetype620 {  fill: #f4e8d0;  }
-    .glazetype630 {  fill: #f7f3eb;  }
-    .glazetype635 {  fill: #ee0000;  }
-    .glazetype640 {  fill: #a52927;  }
-    .glazetype650 {  fill: #9d1624;  }
-    .glazetype660 {  fill: #ca211f;  }
-    .glazetype670 {  fill: #c7a09a;  }
-    .glazetype673 {  fill: #ffc0cb;  }
-    .glazetype675 {  fill: #ff1515;  }
-    .glazetype680 {  fill: #00cc00;  }
-    .glazetype690 {  fill: #2c7649;  }
-    .glazetype700 {  fill: #457640;  }
-    .glazetype710 {  fill: #437f3f;  }
-    .glazetype720 {  fill: #529777;  }
-    .glazetype730 {  fill: #749686;  }
-    .glazetype740 {  fill: #00ff00;  }
-    .glazetype745 {  fill: #40e0d0;  }
-    .glazetype750 {  fill: #0000ff;  }
-    .glazetype760 {  fill: #0047ab;  }
-    .glazetype770 {  fill: #6c94b6;  }
-    .glazetype780 {  fill: #29499c;  }
-    .glazetype790 {  fill: #33a8b9;  }
-    .glazetype800 {  fill: #436a92;  }
-    .glazetype810 {  fill: #0000cc;  }
-    .glazetype820 {  fill: #800080;  }
-    .glazetype830 {  fill: #a41ca4;  }
-    .glazetype840 {  fill: #8a0a95;  }
-    .glazetype850 {  fill: #5d015d;  }
-    .glazetype860 {  fill: #eeeeee;  }
-    .glazetype870 {  fill: #efefef;  }
-    .glazetype880 {  fill: #000000;  }
-    .glazetype890 {  fill: #2a1c0e;  }
-    .glazetype900 {  fill: #222222;  }
-    .glazetype910 {  fill: #111111;  }
-    .glazetype920 {  fill: #ffff00;  }
-    .glazetype930 {  fill: #ffe484;  }
-    .glazetype940 {  fill: #e8d04c;  }
-    .glazetype950 {  fill: #f5ee25;  }
-    .glazetype960 {  fill: #ffff00;  }
-    .glazetype970 {  fill: #fff700;  }
-    .glazetype980 {  fill: #ffffff;  }
-    .glazetype990 {  fill: #ffffff;  }
-    .glazetype1000 {  fill: #ffffff;  }
-    .glazetype1010 {  fill: #ffffff;  }
-    .glazetype1020 {  fill: #ffffff;  }
-    .glazetype1030 {  fill: #ffffff;  }
-    .glazetype1040 {  fill: #ffffff;  }
-    .glazetype1050 {  fill: #ffffff;  }
-    .glazetype1055 {  fill: #ffffff;  }
-    .glazetype1060 {  fill: #ffffff;  }
-    .glazetype1070 {  fill: #ffffff;  }
-    .glazetype1080 {  fill: #ffffff;  }
-    .glazetype1090 {  fill: #ffffff;  }
-    .glazetype1100 {  fill: #ffffff;  }
-    .glazetype1130 {  fill: #ffffff;  }
-    .glazetype1140 {  fill: #ffffff;  }
-    .glazetype1150 {  fill: #ffffff;  }
-    .glazetype1160 {  fill: #ffffff;  }
-    .glazetype1170 {  fill: #ffffff;  }
-
-    .orton {  fill: #999999; }
-    .orton022 {  fill: #cc0000; }
-    .orton021 {  fill: #d30000; }
-    .orton020 {  fill: #d60000; }
-    .orton019 {  fill: #d90000; }
-    .orton018 {  fill: #dd0000; }
-    .orton017 {  fill: #e30000; }
-    .orton016 {  fill: #e60000; }
-    .orton015 {  fill: #e90000; }
-    .orton014 {  fill: #ee0000; }
-    .orton013 {  fill: #f60000; }
-    .orton012 {  fill: #ff0000; }
-    .orton011 {  fill: #ff2200; }
-    .orton010 {  fill: #ff4400; }
-    .orton09 {  fill: #ff5500; }
-    .orton08 {  fill: #ff6600; }
-    .orton07 {  fill: #ff7700; }
-    .orton06 {  fill: #ff8800; }
-    .orton05-1-2 {  fill: #ff9900; }
-    .orton05 {  fill: #ffaa00; }
-    .orton04 {  fill: #ffbb00; }
-    .orton03 {  fill: #ffcc00; }
-    .orton02 {  fill: #ffdd00; }
-    .orton01 {  fill: #ffee00; }
-    .orton1 {  fill: #ffff00; }
-    .orton2 {  fill: #ffff22; }
-    .orton3 {  fill: #ffff44; }
-    .orton4 {  fill: #ffff66; }
-    .orton5 {  fill: #ffff88; }
-    .orton5-1-2 {  fill: #ffffaa; }
-    .orton6 {  fill: #ffffbb; }
-    .orton7 {  fill: #ffffcc; }
-    .orton8 {  fill: #ffffdd; }
-    .orton9 {  fill: #ffffee; }
-    .orton10 {  fill: #ffffff; }
-    .orton11 {  fill: #ffffff; }
-    .orton12 {  fill: #ffffff; }
-    .orton13 {  fill: #ffffff; }
-    .orton14 {  fill: #ffffff; }
-
-    .ortonxx {  fill: #ffffff; }
 </style>

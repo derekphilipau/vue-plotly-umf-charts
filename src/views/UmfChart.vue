@@ -9,23 +9,25 @@
       <div class="column">
         <div id="stull-chart-d3">
           <umf-plotly
-                  :recipeData="this.jsondata.data"
-                  :oxide1="this.form.oxide1"
-                  :oxide2="this.form.oxide2"
-                  :oxide3="this.form.oxide3"
-                  :noZeros="this.form.noZeros"
-                  :isThreeAxes="this.form.isThreeAxes"
-                  :colortype="this.form.colortype"
-                  :glazeType="this.form.glazeType"
-                  :search="this.search"
-                  :showRecipes="this.form.showrecipes"
-                  :showCones="this.form.conecheck"
-                  :showStullChart="this.form.showStullChart"
+                  :recipeData="jsondata.data"
+                  :oxide1="form.oxide1"
+                  :oxide2="form.oxide2"
+                  :oxide3="form.oxide3"
+                  :noZeros="form.noZeros"
+                  :isThreeAxes="form.isThreeAxes"
+                  :colortype="form.colortype"
+                  :materialTypeId="form.glazeType"
+                  :baseTypeId="baseTypeId"
+                  :search="search"
+                  :showRecipes="form.showrecipes"
+                  :showCones="form.conecheck"
+                  :showStullChart="form.showStullChart"
                   :chartHeight="chartHeight"
                   :chartWidth="chartWidth"
                   :axesColor="'#000000'"
                   :gridColor="'#999999'"
                   v-on:clickedUmfPlotly="clicked"
+                  :highlightedRecipeId="highlightedRecipeId"
           >
           </umf-plotly>
         </div>
@@ -119,6 +121,13 @@
              target="_blank" class="button">View on Glazy</a>
         </article>
       </div>
+      <div class="column">
+        <article @mouseover="highlightRecipe(10790)"
+                 @mouseleave="unhighlightRecipe(10790)"
+                 id='recipe-10790' class="tile is-child notification">
+          <p>Hover Test: Recipe 10790</p>
+        </article>
+      </div>
     </div>
     <div class="columns">
       <div class="column">
@@ -178,6 +187,7 @@ export default {
       selected: null,
       searchtext: '',
       clickedRecipe: null,
+      highlightedRecipeId: 0,
       minSearchTextLength: 3,
       chartHeight: 400,
       chartWidth: 300,
@@ -195,6 +205,7 @@ export default {
         isThreeAxes: false
       },
       oxides: Analysis.OXIDE_NAME_UNICODE_SELECT,
+      baseTypeId: new MaterialTypes().GLAZE_TYPE_ID,
       glazeTypes: new MaterialTypes().GLAZES_SELECT,
       cones: new GlazyConstants().ORTON_CONES_SELECT,
       colortypes: [
@@ -246,6 +257,14 @@ export default {
     handleResize: function () {
       this.chartHeight = document.getElementById('stull-chart-d3').clientHeight
       this.chartWidth = document.getElementById('stull-chart-d3').clientWidth
+    },
+    highlightRecipe: function (id) {
+      this.highlightedRecipeId = id
+      console.log('parent highlight' + this.highlightedRecipeId)
+    },
+    unhighlightRecipe: function (id) {
+      this.highlightedRecipeId = 0
+      console.log('parent unhighlight' + this.highlightedRecipeId)
     }
   },
   components: {
@@ -272,6 +291,43 @@ export default {
     border: 1px solid white;
   }
 
+  .r2o-colors tr td {
+    color: #ffffff;
+    font-size: .85em;
+    line-height: 1em;
+    padding: .2em;
+    width: 2.5em;
+    margin: 1px;
+    text-align: center;
+  }
+  .r2o-colors tr td.label {
+    color: #000000;
+    white-space:nowrap;
+    width: 60px;
+  }
+
+  .r2ocolor-b-100 { background-color: #FF3333; }
+  .r2ocolor-b-95  { background-color: #F4333D; }
+  .r2ocolor-b-90  { background-color: #EA3347; }
+  .r2ocolor-b-85  { background-color: #E03351; }
+  .r2ocolor-b-80  { background-color: #D6335B; }
+  .r2ocolor-b-75  { background-color: #CC3366; }
+  .r2ocolor-b-70  { background-color: #C13370; }
+  .r2ocolor-b-65  { background-color: #B7337A; }
+  .r2ocolor-b-60  { background-color: #AD3384; }
+  .r2ocolor-b-55  { background-color: #A3338E; }
+  .r2ocolor-b-50  { background-color: #993399; }
+  .r2ocolor-b-45  { background-color: #8E33A3; }
+  .r2ocolor-b-40  { background-color: #8433AD; }
+  .r2ocolor-b-35  { background-color: #7A33B7; }
+  .r2ocolor-b-30  { background-color: #7033C1; }
+  .r2ocolor-b-25  { background-color: #6633CC; }
+  .r2ocolor-b-20  { background-color: #5B33D6; }
+  .r2ocolor-b-15  { background-color: #5133E0; }
+  .r2ocolor-b-10  { background-color: #4733EA; }
+  .r2ocolor-b-5   { background-color: #3D33F4; }
+  .r2ocolor-b-0   { background-color: #3333FF; }
+    /*
   .orton-b-022 {  background-color: #cc0000; }
   .orton-b-021 {  background-color: #d30000; }
   .orton-b-020 {  background-color: #d60000; }
@@ -310,42 +366,6 @@ export default {
   .orton-b-12 {  background-color: #ffffff; }
   .orton-b-13 {  background-color: #ffffff; }
   .orton-b-14 {  background-color: #ffffff; }
-
-  .r2o-colors tr td {
-    color: #ffffff;
-    font-size: .85em;
-    line-height: 1em;
-    padding: .2em;
-    width: 2.5em;
-    margin: 1px;
-    text-align: center;
-  }
-  .r2o-colors tr td.label {
-    color: #000000;
-    white-space:nowrap;
-    width: 60px;
-  }
-
-  .r2ocolor-b-100 { background-color: #FF3333; }
-  .r2ocolor-b-95  { background-color: #F4333D; }
-  .r2ocolor-b-90  { background-color: #EA3347; }
-  .r2ocolor-b-85  { background-color: #E03351; }
-  .r2ocolor-b-80  { background-color: #D6335B; }
-  .r2ocolor-b-75  { background-color: #CC3366; }
-  .r2ocolor-b-70  { background-color: #C13370; }
-  .r2ocolor-b-65  { background-color: #B7337A; }
-  .r2ocolor-b-60  { background-color: #AD3384; }
-  .r2ocolor-b-55  { background-color: #A3338E; }
-  .r2ocolor-b-50  { background-color: #993399; }
-  .r2ocolor-b-45  { background-color: #8E33A3; }
-  .r2ocolor-b-40  { background-color: #8433AD; }
-  .r2ocolor-b-35  { background-color: #7A33B7; }
-  .r2ocolor-b-30  { background-color: #7033C1; }
-  .r2ocolor-b-25  { background-color: #6633CC; }
-  .r2ocolor-b-20  { background-color: #5B33D6; }
-  .r2ocolor-b-15  { background-color: #5133E0; }
-  .r2ocolor-b-10  { background-color: #4733EA; }
-  .r2ocolor-b-5   { background-color: #3D33F4; }
-  .r2ocolor-b-0   { background-color: #3333FF; }
+  */
 
 </style>
