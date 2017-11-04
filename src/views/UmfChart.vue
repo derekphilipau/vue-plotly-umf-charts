@@ -26,9 +26,10 @@
                   :chartWidth="chartWidth"
                   :axesColor="'#000000'"
                   :gridColor="'#999999'"
-                  v-on:clickedUmfPlotly="clicked"
+                  :currentRecipeId="4184"
                   :highlightedRecipeId="highlightedRecipeId"
                   :showModeBar="showModeBar"
+                  v-on:clickedUmfPlotly="clicked"
           >
           </umf-plotly>
         </div>

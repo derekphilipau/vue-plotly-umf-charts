@@ -54,6 +54,10 @@
         type: Boolean,
         default: false
       },
+      currentRecipeId: {
+        type: Number,
+        default: 0
+      },
       highlightedRecipeId: {
         type: Number,
         default: 0
@@ -123,7 +127,9 @@
         materialTypes: new MaterialTypes(),
         minSearchTextLength: 3,
         defaultMarkerSize: 8,
-        highlightedMarkerSize: 12,
+        currentMarkerSize: 12,
+        highlightedMarkerSize: 14,
+        analysisMarkerSize: 8,
         defaultPlotlyConfiguration: {
           modeBarButtonsToRemove: [
             'sendDataToCloud',
@@ -188,16 +194,19 @@
       },
       highlightedRecipeId: function (newValue) {
         this.highlightRecipe()
+      },
+      currentRecipeId: function (newValue) {
+        this.reset(true)
       }
     },
     computed: {
       hasdata: function () {
-        if (this.filtereddata && this.filtereddata.length > 0) {
+        if (this.filteredData && this.filteredData.length > 0) {
           return true
         }
         return false
       },
-      filtereddata: function () {
+      filteredData: function () {
         // If we directly use this.recipeData var, Vue gets BUSY..
         var mydata = this.recipeData
 
@@ -206,9 +215,10 @@
         }
 
         var mylen = mydata.length
-        var filtereddata = {
+        var filteredData = {
           mode: 'markers',
           marker: {
+            symbol: [],
             color: [],
             size: [],
             opacity: 0.5
@@ -231,9 +241,9 @@
         var matrix = [] // Keep track of collisions
 
         if (this.isThreeAxes) {
-          filtereddata.type = 'scatter3d'
+          filteredData.type = 'scatter3d'
         } else {
-          filtereddata.type = 'scatter'
+          filteredData.type = 'scatter'
         }
 
         var materialTypeBranch = []
@@ -295,29 +305,29 @@
             }
           }
 
-          var currentLength = filtereddata.x.length
-          filtereddata.x[currentLength] = xVal
-          filtereddata.y[currentLength] = yVal
-          filtereddata.z[currentLength] = zVal
+          var currentLength = filteredData.x.length
+          filteredData.x[currentLength] = xVal
+          filteredData.y[currentLength] = yVal
+          filteredData.z[currentLength] = zVal
 
-          if (xVal > filtereddata.maxX) {
-            filtereddata.maxX = xVal
+          if (xVal > filteredData.maxX) {
+            filteredData.maxX = xVal
           }
-          if (yVal > filtereddata.maxY) {
-            filtereddata.maxY = yVal
+          if (yVal > filteredData.maxY) {
+            filteredData.maxY = yVal
           }
-          if (zVal > filtereddata.maxZ) {
-            filtereddata.maxZ = zVal
+          if (zVal > filteredData.maxZ) {
+            filteredData.maxZ = zVal
           }
 
-          if (xVal < filtereddata.minX) {
-            filtereddata.minX = xVal
+          if (xVal < filteredData.minX) {
+            filteredData.minX = xVal
           }
-          if (yVal < filtereddata.minY) {
-            filtereddata.minY = yVal
+          if (yVal < filteredData.minY) {
+            filteredData.minY = yVal
           }
-          if (zVal < filtereddata.minZ) {
-            filtereddata.minZ = zVal
+          if (zVal < filteredData.minZ) {
+            filteredData.minZ = zVal
           }
 
           var tooltip = ''
@@ -362,22 +372,34 @@
             Number(mydata[i].analysis.umfAnalysis.ROTotal).toFixed(2) +
             '</span> R<sub>2</sub>O:RO'
 
-          filtereddata.text[currentLength] = tooltip
-          filtereddata.customdata[currentLength] = mydata[i].id
-          filtereddata.marker.color[currentLength] =
-            this.getR2OFillColor(mydata[i].analysis.umfAnalysis.R2OTotal)
-          filtereddata.marker.size[currentLength] =
+          filteredData.text[currentLength] = tooltip
+          filteredData.customdata[currentLength] = mydata[i].id
+          if (this.currentRecipeId &&
+            this.currentRecipeId === mydata[i].id) {
+            filteredData.marker.symbol[currentLength] = 'x'
+            filteredData.marker.size[currentLength] =
+              this.currentMarkerSize
+          } else if (mydata[i].isAnalysis) {
+            filteredData.marker.symbol[currentLength] = 'diamond'
+            filteredData.marker.size[currentLength] =
+              this.analysisMarkerSize
+          } else {
+            filteredData.marker.symbol[currentLength] = 'circle'
+            filteredData.marker.size[currentLength] =
               this.defaultMarkerSize
+          }
+          filteredData.marker.color[currentLength] =
+            this.getR2OFillColor(mydata[i].analysis.umfAnalysis.R2OTotal)
         }
 
-        console.log('Number of Recipes: ' + filtereddata.x.length)
+        console.log('Number of Recipes: ' + filteredData.x.length)
 
-        return filtereddata
+        return filteredData
       }
     },
     methods: {
       plotly3DChart: function (isNew = false) {
-        var data = [this.filtereddata]
+        var data = [this.filteredData]
         if (isNew) {
           Plotly.newPlot('stull-chart-d3', data, this.get3DLayout(), this.defaultPlotlyConfiguration)
 
@@ -391,7 +413,7 @@
         }
       },
       plotly2DChart: function (isNew = false) {
-        var data = [this.filtereddata]
+        var data = [this.filteredData]
         if (isNew) {
           Plotly.newPlot('stull-chart-d3', data, this.get2DLayout(data), this.defaultPlotlyConfiguration)
           this.myPlot.on('plotly_click', function (data) {
@@ -519,14 +541,14 @@
           this.oxide1 === Analysis.OXIDE_NAME.Al2O3 &&
           this.baseTypeId === this.materialTypes.GLAZE_TYPE_ID) {
           // Limits of Stull chart are x: 0.5, 7.2, y: 0, 1
-          if (this.filtereddata.maxX < 7.2) {
-            if (this.filtereddata.minX < 0.5) {
+          if (this.filteredData.maxX < 7.2) {
+            if (this.filteredData.minX < 0.5) {
               layout.xaxis.range = [0, 7.2]
             } else {
               layout.xaxis.range = [0.5, 7.2]
             }
           }
-          if (this.filtereddata.maxY < 1) {
+          if (this.filteredData.maxY < 1) {
             layout.yaxis.range = [0, 1]
           }
           layout.shapes = [
@@ -722,18 +744,24 @@
         return Number(Math.round(value + 'e' + decimals) + 'e-' + decimals)
       },
       highlightRecipe () {
-        if (this.filtereddata.customdata &&
-          this.filtereddata.customdata.length > 0) {
-          var len = this.filtereddata.customdata.length
+        if (this.filteredData.customdata &&
+          this.filteredData.customdata.length > 0) {
+          var len = this.filteredData.customdata.length
           var markerSizes = []
           for (var i = 0; i < len; i++) {
+            var recipeId = Number(this.filteredData.customdata[i])
             if (this.highlightedRecipeId &&
-              this.highlightedRecipeId === Number(this.filtereddata.customdata[i])) {
+              this.highlightedRecipeId === recipeId) {
               markerSizes[i] =
                 this.highlightedMarkerSize
             } else {
-              markerSizes[i] =
-                this.defaultMarkerSize
+              if (recipeId === this.currentRecipeId) {
+                markerSizes[i] =
+                  this.currentMarkerSize
+              } else {
+                markerSizes[i] =
+                  this.defaultMarkerSize
+              }
             }
           }
           Plotly.restyle('stull-chart-d3', 'marker.size', [markerSizes])
