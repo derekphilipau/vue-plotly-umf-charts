@@ -28,6 +28,7 @@
                   :gridColor="'#999999'"
                   v-on:clickedUmfPlotly="clicked"
                   :highlightedRecipeId="highlightedRecipeId"
+                  :showModeBar="showModeBar"
           >
           </umf-plotly>
         </div>
@@ -191,6 +192,7 @@ export default {
       minSearchTextLength: 3,
       chartHeight: 400,
       chartWidth: 300,
+      showModeBar: true,
       form: {
         conecheck: false,
         showStullChart: true,

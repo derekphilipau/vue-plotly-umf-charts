@@ -79,6 +79,10 @@
         type: Boolean,
         default: true
       },
+      showModeBar: {
+        type: Boolean,
+        default: true
+      },
       axesColor: {
         type: String,
         default: '#999999'
@@ -131,6 +135,7 @@
             'resetCameraLastSave3d'
           ],
           displaylogo: false,
+          displayModeBar: this.showModeBar,
           showTips: true
         }
       }
