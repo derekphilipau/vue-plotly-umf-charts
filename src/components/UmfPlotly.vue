@@ -595,53 +595,54 @@
           ]
 
           // Don't show Stull labels if limits are too great.
-          if (data.limitx > 10 ||
-            data.limity > 2) {
-            layout.annotations = [
-              {
-                x: 1.9,
-                y: 0.95,
-                xref: 'x',
-                yref: 'y',
-                text: 'UNFUSED',
-                showarrow: false
-              },
-              {
-                x: 3.1,
-                y: 0.95,
-                xref: 'x',
-                yref: 'y',
-                text: 'MATTE',
-                showarrow: false
-              },
-              {
-                x: 4.3,
-                y: 0.95,
-                xref: 'x',
-                yref: 'y',
-                text: 'SEMI-MATTE',
-                showarrow: false
-              },
-              {
-                x: 4.3,
-                y: 0.2,
-                xref: 'x',
-                yref: 'y',
-                text: 'UNDERFIRED',
-                showarrow: false
-              },
-              {
-                x: 1.8,
-                y: 0.2,
-                xref: 'x',
-                yref: 'y',
-                text: 'CRAZED',
-                showarrow: false
-              }
-            ]
-          }
+          // if (data.limitx > 10 || data.limity > 2) {
+          layout.annotations = [
+            {
+              x: 1.8,
+              y: 0.89,
+              xref: 'x',
+              yref: 'y',
+              text: 'UNFUSED',
+              showarrow: false,
+              textangle: -35
+            },
+            {
+              x: 2.95,
+              y: 0.89,
+              xref: 'x',
+              yref: 'y',
+              text: 'MATTE',
+              showarrow: false,
+              textangle: -35
+            },
+            {
+              x: 3.95,
+              y: 0.89,
+              xref: 'x',
+              yref: 'y',
+              text: 'SEMI-MATTE',
+              showarrow: false,
+              textangle: -35
+            },
+            {
+              x: 4.3,
+              y: 0.2,
+              xref: 'x',
+              yref: 'y',
+              text: 'UNDERFIRED',
+              showarrow: false,
+              textangle: -15
+            },
+            {
+              x: 1.8,
+              y: 0.2,
+              xref: 'x',
+              yref: 'y',
+              text: 'CRAZED',
+              showarrow: false
+            }
+          ]
         }
-
         return layout
       },
       reset: function (isNew = false) {
