@@ -206,49 +206,34 @@
         }
 
         var mylen = mydata.length
-        var filtereddata = {}
+        var filtereddata = {
+          mode: 'markers',
+          marker: {
+            color: [],
+            size: [],
+            opacity: 0.5
+          },
+          hoverinfo: 'text',
+          x: [],
+          y: [],
+          z: [],
+          maxX: 0,
+          maxY: 0,
+          maxZ: 0,
+          minX: 100,
+          minY: 100,
+          minZ: 100,
+          name: [],
+          text: [],
+          customdata: []
+        }
+
         var matrix = [] // Keep track of collisions
 
         if (this.isThreeAxes) {
-          filtereddata = {
-            type: 'scatter3d',
-            mode: 'markers',
-            marker: {
-              color: [],
-              size: [],
-              opacity: 0.5
-            },
-            hoverinfo: 'text',
-            x: [],
-            y: [],
-            z: [],
-            limitx: 0,
-            limity: 0,
-            limitz: 0,
-            name: [],
-            text: [],
-            customdata: []
-          }
+          filtereddata.type = 'scatter3d'
         } else {
-          filtereddata = {
-            type: 'scatter',
-            mode: 'markers',
-            marker: {
-              color: [],
-              size: [],
-              opacity: 0.5
-            },
-            hoverinfo: 'text',
-            x: [],
-            y: [],
-            z: [],
-            limitx: 0,
-            limity: 0,
-            limitz: 0,
-            name: [],
-            text: [],
-            customdata: []
-          }
+          filtereddata.type = 'scatter'
         }
 
         var materialTypeBranch = []
@@ -315,14 +300,24 @@
           filtereddata.y[currentLength] = yVal
           filtereddata.z[currentLength] = zVal
 
-          if (xVal > filtereddata.limitx) {
-            filtereddata.limitx = xVal
+          if (xVal > filtereddata.maxX) {
+            filtereddata.maxX = xVal
           }
-          if (yVal > filtereddata.limity) {
-            filtereddata.limity = yVal
+          if (yVal > filtereddata.maxY) {
+            filtereddata.maxY = yVal
           }
-          if (zVal > filtereddata.limitz) {
-            filtereddata.limitz = zVal
+          if (zVal > filtereddata.maxZ) {
+            filtereddata.maxZ = zVal
+          }
+
+          if (xVal < filtereddata.minX) {
+            filtereddata.minX = xVal
+          }
+          if (yVal < filtereddata.minY) {
+            filtereddata.minY = yVal
+          }
+          if (zVal < filtereddata.minZ) {
+            filtereddata.minZ = zVal
           }
 
           var tooltip = ''
@@ -519,16 +514,21 @@
           }
         }
 
-        var isSiAlAxes = true
-        if (this.oxide2 !== Analysis.OXIDE_NAME.SiO2 ||
-          this.oxide1 !== Analysis.OXIDE_NAME.Al2O3) {
-          // Do not show Si:Al map overlays
-          isSiAlAxes = false
-        }
-
         if (this.showStullChart &&
-          isSiAlAxes &&
+          this.oxide2 === Analysis.OXIDE_NAME.SiO2 &&
+          this.oxide1 === Analysis.OXIDE_NAME.Al2O3 &&
           this.baseTypeId === this.materialTypes.GLAZE_TYPE_ID) {
+          // Limits of Stull chart are x: 0.5, 7.2, y: 0, 1
+          if (this.filtereddata.maxX < 7.2) {
+            if (this.filtereddata.minX < 0.5) {
+              layout.xaxis.range = [0, 7.2]
+            } else {
+              layout.xaxis.range = [0.5, 7.2]
+            }
+          }
+          if (this.filtereddata.maxY < 1) {
+            layout.yaxis.range = [0, 1]
+          }
           layout.shapes = [
             // Stull Unfused
             {
@@ -600,7 +600,7 @@
           ]
 
           // Don't show Stull labels if limits are too great.
-          // if (data.limitx > 10 || data.limity > 2) {
+          // if (data.maxX > 10 || data.maxY > 2) {
           layout.annotations = [
             {
               x: 1.8,
