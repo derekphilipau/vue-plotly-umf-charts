@@ -221,7 +221,11 @@
             symbol: [],
             color: [],
             size: [],
-            opacity: 0.5
+            line: {
+              width: 0.5,
+              color: 'rgb(0,0,0,1)'
+            },
+            opacity: 1
           },
           hoverinfo: 'text',
           x: [],
@@ -275,6 +279,9 @@
           var xVal = 0.0
           var yVal = 0.0
           var zVal = 0.0
+          var xValOrig = 0.0
+          var yValOrig = 0.0
+          var zValOrig = 0.0
           if (this.isThreeAxes) {
             xVal = parseFloat(mydata[i].analysis.umfAnalysis[this.oxide3])
             zVal = parseFloat(mydata[i].analysis.umfAnalysis[this.oxide1])
@@ -284,12 +291,34 @@
             if (isNaN(zVal)) { zVal = 0.0 }
             if (isNaN(yVal)) { yVal = 0.0 }
 
+            xValOrig = xVal
+            yValOrig = yVal
+            zValOrig = zVal
+
             if (this.noZeros && (xVal <= 0 || yVal <= 0 || zVal <= 0)) {
               continue
+            }
+
+            // Adjust coordinates using stacked collision
+            var point3d = xVal.toFixed(2) + ':' + yVal.toFixed(2) + ':' + zVal.toFixed(2)
+            if (point3d in matrix) {
+              var tens = Math.floor(matrix[point3d] / 10)
+              var angle = matrix[point3d] * 0.63
+              zVal = zVal + 0.005 * tens * Math.cos(angle)
+              yVal = yVal + 0.005 * tens * Math.sin(angle)
+              matrix[point3d] += 1
+            } else {
+              matrix[point3d] = 1
             }
           } else {
             xVal = parseFloat(mydata[i].analysis.umfAnalysis[this.oxide2])
             yVal = parseFloat(mydata[i].analysis.umfAnalysis[this.oxide1])
+
+            if (isNaN(xVal)) { xVal = 0.0 }
+            if (isNaN(yVal)) { yVal = 0.0 }
+
+            xValOrig = xVal
+            yValOrig = yVal
 
             if (isNaN(xVal) || isNaN(yVal)) {
               continue
@@ -301,7 +330,7 @@
               yVal += matrix[point]
               matrix[point] += 0.001
             } else {
-              matrix[point] = 0
+              matrix[point] = 0.001
             }
           }
 
@@ -346,31 +375,31 @@
 
           if (mydata[i].materialTypeId &&
               this.materialTypes.LOOKUP[mydata[i].materialTypeId]) {
-            tooltip += '<br><span style="color:#cccccc">' +
+            tooltip += '<br><span style="color:#444444">' +
               this.materialTypes.LOOKUP[mydata[i].materialTypeId] +
               '</span>'
           }
           tooltip += '<br>'
-          if (this.isThreeAxis) {
-            tooltip += Number(xVal).toFixed(2) +
-              ' ' + Analysis.OXIDE_NAME_DISPLAY[this.oxide3] + ' ' +
-              Number(zVal).toFixed(2) + ' ' +
+          if (this.isThreeAxes) {
+            tooltip += Number(yValOrig).toFixed(2) + ' ' +
+              Analysis.OXIDE_NAME_DISPLAY[this.oxide2] + ' ' +
+              Number(zValOrig).toFixed(2) + ' ' +
               Analysis.OXIDE_NAME_DISPLAY[this.oxide1] + ' ' +
-              Number(yVal).toFixed(2) + ' ' +
-              Analysis.OXIDE_NAME_DISPLAY[this.oxide2]
+              Number(xValOrig).toFixed(2) + ' ' +
+              Analysis.OXIDE_NAME_DISPLAY[this.oxide3]
           } else {
-            tooltip += Number(xVal).toFixed(2) +
+            tooltip += Number(xValOrig).toFixed(2) +
               ' ' + Analysis.OXIDE_NAME_DISPLAY[this.oxide2] + ' ' +
-              Number(yVal).toFixed(2) + ' ' +
+              Number(yValOrig).toFixed(2) + ' ' +
               Analysis.OXIDE_NAME_DISPLAY[this.oxide1]
           }
-          tooltip += '<br><span style="color:yellow">' +
+          tooltip += '<br><b>' +
             Number(mydata[i].analysis.umfAnalysis.SiO2Al2O3Ratio).toFixed(2) +
-            '</span> SiO<sub>2</sub>:Al<sub>2</sub>O<sub>3</sub>' +
-            '<br><span style="color:yellow">' +
+            '</b> SiO<sub>2</sub>:Al<sub>2</sub>O<sub>3</sub>' +
+            '<br><b>' +
             Number(mydata[i].analysis.umfAnalysis.R2OTotal).toFixed(2) + ':' +
             Number(mydata[i].analysis.umfAnalysis.ROTotal).toFixed(2) +
-            '</span> R<sub>2</sub>O:RO'
+            '</b> R<sub>2</sub>O:RO'
 
           filteredData.text[currentLength] = tooltip
           filteredData.customdata[currentLength] = mydata[i].id
@@ -683,8 +712,57 @@
         if (isNaN(r2oTotal)) {
           return ''
         }
+        // http://www.perbang.dk/rgbgradient/
+        // 7 & 15 steps
         var index = Math.round((this.round(Number(r2oTotal) * 2, 1) / 2) * 100)
         switch (index) {
+          case 100: return '#FF0000'
+          case 95: return '#FF1212'
+          case 90: return '#FF2424'
+          case 85: return '#FF3636'
+          case 80: return '#FF4848'
+          case 75: return '#FF5B5B'
+          case 70: return '#FF6D6D'
+          case 65: return '#FF7F7F'
+          case 60: return '#FF9191'
+          case 55: return '#FFA3A3'
+          case 50: return '#FFB6B6'
+          case 45: return '#FFC8C8'
+          case 40: return '#FFDADA'
+          case 35: return '#FFECEC'
+          case 30: return '#FFFFFF'
+          case 25: return '#D4D4FF'
+          case 20: return '#AAAAFF'
+          case 15: return '#7F7FFF'
+          case 10: return '#5555FF'
+          case 5: return '#2A2AFF'
+          case 0: return '#0000FF'
+          default: return '#333333'
+
+          /*
+           case 100: return '#ff0000'
+           case 95: return '#ec0012'
+           case 90: return '#da0024'
+           case 85: return '#c80036'
+           case 80: return '#b60048'
+           case 75: return '#a3005b'
+           case 70: return '#91006d'
+           case 65: return '#7f007f'
+           case 60: return '#6d0091'
+           case 55: return '#5b00a3'
+           case 50: return '#4800b6'
+           case 45: return '#3600c8'
+           case 40: return '#2400da'
+           case 35: return '#1200ec'
+           case 30: return '#0000ff'
+           case 25: return '#002ad4'
+           case 20: return '#0055aa'
+           case 15: return '#007f7f'
+           case 10: return '#00aa55'
+           case 5: return '#00d42a'
+           case 0: return '#00ff00'
+           default: return '#cccccc'
+           //
           case 100: return '#FF3333'
           case 95: return '#F4333D'
           case 90: return '#EA3347'
@@ -707,6 +785,7 @@
           case 5: return '#3D33F4'
           case 0: return '#3333FF'
           default: return '#333333'
+          */
         }
       },
       getConeString: function (fromOrtonConeId, toOrtonConeId, isHtml = false) {
