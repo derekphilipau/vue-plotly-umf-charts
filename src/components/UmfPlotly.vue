@@ -570,15 +570,18 @@
           this.oxide1 === Analysis.OXIDE_NAME.Al2O3 &&
           this.baseTypeId === this.materialTypes.GLAZE_TYPE_ID) {
           // Limits of Stull chart are x: 0.5, 7.2, y: 0, 1
-          if (this.filteredData.maxX < 7.2) {
-            if (this.filteredData.minX < 0.5) {
-              layout.xaxis.range = [0, 7.2]
-            } else {
-              layout.xaxis.range = [0.5, 7.2]
+
+          if (this.filteredData) {
+            if (this.filteredData.maxX < 7.2) {
+              if (this.filteredData.minX < 0.5) {
+                layout.xaxis.range = [0, 7.2]
+              } else {
+                layout.xaxis.range = [0.5, 7.2]
+              }
             }
-          }
-          if (this.filteredData.maxY < 1) {
-            layout.yaxis.range = [0, 1]
+            if (this.filteredData.maxY < 1) {
+              layout.yaxis.range = [0, 1]
+            }
           }
           layout.shapes = [
             // Stull Unfused
