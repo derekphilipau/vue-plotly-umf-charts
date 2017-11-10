@@ -1,8 +1,8 @@
 <template>
 </template>
 <script>
-  import Plotly from 'plotly.js/dist/plotly'
-
+  import Plotly from 'plotly.js/dist/plotly-gl3d'
+  // import Plotly from plotly
   import Analysis from 'ceramicscalc-js/src/analysis/Analysis'
   import MaterialTypes from 'ceramicscalc-js/src/material/MaterialTypes'
   import GlazyConstants from 'ceramicscalc-js/src/helpers/GlazyConstants'
