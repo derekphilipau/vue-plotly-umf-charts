@@ -123,6 +123,7 @@
     data () {
       return {
         myPlot: null,
+        isPlotlyDone: false,
         constants: new GlazyConstants(),
         materialTypes: new MaterialTypes(),
         minSearchTextLength: 3,
@@ -187,10 +188,14 @@
         this.reset(true)
       },
       chartWidth: function (newValue) {
-        Plotly.relayout('stull-chart-d3', { width: this.chartWidth, height: this.chartHeight })
+        if (this.isPlotlyDone) {
+          Plotly.relayout('stull-chart-d3', { width: this.chartWidth, height: this.chartHeight })
+        }
       },
       chartHeight: function (newValue) {
-        Plotly.relayout('stull-chart-d3', { width: this.chartWidth, height: this.chartHeight })
+        if (this.isPlotlyDone) {
+          Plotly.relayout('stull-chart-d3', { width: this.chartWidth, height: this.chartHeight })
+        }
       },
       highlightedRecipeId: function (newValue) {
         this.highlightRecipe()
@@ -374,9 +379,9 @@
           }
 
           if (mydata[i].materialTypeId &&
-              this.materialTypes.LOOKUP[mydata[i].materialTypeId]) {
+              MaterialTypes.LOOKUP[mydata[i].materialTypeId]) {
             tooltip += '<br><span style="color:#444444">' +
-              this.materialTypes.LOOKUP[mydata[i].materialTypeId] +
+              MaterialTypes.LOOKUP[mydata[i].materialTypeId] +
               '</span>'
           }
           tooltip += '<br>'
@@ -430,7 +435,9 @@
       plotly3DChart: function (isNew = false) {
         var data = [this.filteredData]
         if (isNew) {
-          Plotly.newPlot('stull-chart-d3', data, this.get3DLayout(), this.defaultPlotlyConfiguration)
+          Plotly.newPlot('stull-chart-d3', data, this.get3DLayout(), this.defaultPlotlyConfiguration).then(function () {
+            this.isPlotlyDone = true
+          }.bind(this))
 
           this.myPlot.on('plotly_click', function (data) {
             if (data.points && data.points[0].customdata) {
@@ -444,7 +451,9 @@
       plotly2DChart: function (isNew = false) {
         var data = [this.filteredData]
         if (isNew) {
-          Plotly.newPlot('stull-chart-d3', data, this.get2DLayout(data), this.defaultPlotlyConfiguration)
+          Plotly.newPlot('stull-chart-d3', data, this.get2DLayout(data), this.defaultPlotlyConfiguration).then(function () {
+            this.isPlotlyDone = true
+          }.bind(this))
           this.myPlot.on('plotly_click', function (data) {
             if (data.points && data.points[0].customdata) {
               this.$emit('clickedUmfPlotly', data.points[0])
