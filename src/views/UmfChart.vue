@@ -1,12 +1,12 @@
 <template>
-  <section class="section">
-    <div class="columns">
-      <div class="column">
+  <div class="container">
+    <div class="row">
+      <div class="col">
         <h1 class="title">Vue Plotly 3D UMF Charts</h1>
       </div>
     </div>
-    <div class="columns">
-      <div class="column">
+    <div class="row">
+      <div class="col">
         <div id="stull-chart-d3">
           <umf-plotly
                   :recipeData="jsondata.data"
@@ -35,16 +35,16 @@
         </div>
       </div>
     </div>
-    <div class="columns">
-      <div class="column">
+    <div class="row">
+      <div class="col">
         <div class="field is-horizontal">
 
-          <b-field id="searchInput">
+          <b-form-group id="searchInput">
             <b-input v-model="textComputed"
                      placeholder="Keyword"></b-input>
-          </b-field>
+          </b-form-group>
 
-          <b-field id="glazeTypeGroup">
+          <b-form-group id="glazeTypeGroup">
             <b-select v-model="form.glazeType">
               <option
                       v-for="option in glazeTypes"
@@ -54,11 +54,11 @@
                 {{ option.text }}
               </option>
             </b-select>
-          </b-field>
+          </b-form-group>
 
 
 
-          <b-field id="oxide1">
+          <b-form-group id="oxide1">
             <b-select v-model="form.oxide1">
               <option
                       v-for="option in oxides"
@@ -68,9 +68,9 @@
                 {{ option.text }}
               </option>
             </b-select>
-          </b-field>
+          </b-form-group>
 
-          <b-field id="oxide2">
+          <b-form-group id="oxide2">
             <b-select v-model="form.oxide2">
               <option
                       v-for="option in oxides"
@@ -80,9 +80,9 @@
                 {{ option.text }}
               </option>
             </b-select>
-          </b-field>
+          </b-form-group>
 
-          <b-field id="oxide3" v-if="form.isThreeAxes">
+          <b-form-group id="oxide3" v-if="form.isThreeAxes">
             <b-select v-model="form.oxide3">
               <option
                       v-for="option in oxides"
@@ -92,14 +92,14 @@
                 {{ option.text }}
               </option>
             </b-select>
-          </b-field>
+          </b-form-group>
 
           <button class="button is-info" @click="resetForm">Reset Form</button>
         </div>
       </div>
     </div>
-    <div class="columns">
-      <div class="column">
+    <div class="row">
+      <div class="col">
         <div class="field is-horizontal"  v-if="form.isThreeAxes">
           <b-checkbox v-model="form.noZeros">
             Recipes must contain <em>ALL</em> oxides (X, Y, and Z)
@@ -116,14 +116,14 @@
           </b-checkbox>
         </div>
       </div>
-      <div class="column" v-if="clickedRecipe">
+      <div class="col" v-if="clickedRecipe">
         <article class="tile is-child notification is-info">
           <p v-html="clickedRecipe.text"></p>
           <a v-bind:href="'https://glazy.org/recipes/' + clickedRecipe.customdata"
              target="_blank" class="button">View on Glazy</a>
         </article>
       </div>
-      <div class="column">
+      <div class="col">
         <article @mouseover="highlightRecipe(10790)"
                  @mouseleave="unhighlightRecipe(10790)"
                  id='recipe-10790' class="tile is-child notification">
@@ -131,8 +131,8 @@
         </article>
       </div>
     </div>
-    <div class="columns">
-      <div class="column">
+    <div class="row">
+      <div class="col">
         <table class="r2o-colors" v-if="form.colortype==='r2o'">
           <tbody>
           <tr>
@@ -163,12 +163,12 @@
         </table>
       </div>
     </div>
-  </section>
+  </div>
 </template>
 
 <script>
 import UmfPlotly from '../components/UmfPlotly'
-import StaticDataset from '../../static/data/all_api_output.edit.mini.json'
+import StaticDataset from '../assets/data/all_api_output.edit.mini.json'
 
 import Analysis from 'ceramicscalc-js/src/analysis/Analysis'
 import MaterialTypes from 'ceramicscalc-js/src/material/MaterialTypes'
@@ -255,7 +255,6 @@ export default {
     },
     clicked: function (data) {
       this.clickedRecipe = data
-      console.log(data)
     },
     handleResize: function () {
       this.chartHeight = document.getElementById('stull-chart-d3').clientHeight
@@ -263,11 +262,9 @@ export default {
     },
     highlightRecipe: function (id) {
       this.highlightedRecipeId = id
-      console.log('parent highlight' + this.highlightedRecipeId)
     },
-    unhighlightRecipe: function (id) {
+    unhighlightRecipe: function () {
       this.highlightedRecipeId = 0
-      console.log('parent unhighlight' + this.highlightedRecipeId)
     }
     /*
     csvJSON: function () {

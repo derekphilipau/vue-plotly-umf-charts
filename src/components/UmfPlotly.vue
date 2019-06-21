@@ -1,4 +1,5 @@
 <template>
+  <div></div>
 </template>
 <script>
   import Plotly from 'plotly.js/dist/plotly-gl3d'
@@ -157,50 +158,50 @@
       }
     },
     watch: {
-      recipeData: function (newValue) {
+      recipeData: function () {
         this.reset(true)
       },
-      extraRegions: function (newValue) {
+      extraRegions: function () {
         this.reset()
       },
-      oxide3: function (newValue) {
+      oxide3: function () {
         this.reset(true)
       },
-      oxide2: function (newValue) {
+      oxide2: function () {
         this.reset(true)
       },
-      oxide1: function (newValue) {
+      oxide1: function () {
         this.reset(true)
       },
-      materialTypeId: function (newValue) {
+      materialTypeId: function () {
         this.reset(true)
       },
-      search: function (newValue) {
+      search: function () {
         this.reset(true)
       },
-      noZeros: function (newValue) {
+      noZeros: function () {
         this.reset(true)
       },
-      isThreeAxes: function (newValue) {
+      isThreeAxes: function () {
         this.reset(true)
       },
-      showStullChart: function (newValue) {
+      showStullChart: function () {
         this.reset(true)
       },
-      chartWidth: function (newValue) {
+      chartWidth: function () {
         if (this.isPlotlyDone) {
           Plotly.relayout('stull-chart-d3', { width: this.chartWidth, height: this.chartHeight })
         }
       },
-      chartHeight: function (newValue) {
+      chartHeight: function () {
         if (this.isPlotlyDone) {
           Plotly.relayout('stull-chart-d3', { width: this.chartWidth, height: this.chartHeight })
         }
       },
-      highlightedRecipeId: function (newValue) {
+      highlightedRecipeId: function () {
         this.highlightRecipe()
       },
-      currentRecipeId: function (newValue) {
+      currentRecipeId: function () {
         this.reset(true)
       }
     },
@@ -511,7 +512,7 @@
         }
         return layout
       },
-      get2DLayout: function (data) {
+      get2DLayout: function () {
         var layout = {
           hovermode: 'closest',
           title: 'Recipe Info',
@@ -818,7 +819,7 @@
         }
         return ortonCone
       },
-      getAverageCone: function (fromOrtonConeId, toOrtonConeId, isHtml = false) {
+      getAverageCone: function (fromOrtonConeId, toOrtonConeId) {
         if (fromOrtonConeId) {
           if (toOrtonConeId && fromOrtonConeId !== toOrtonConeId) {
             return this.constants.ORTON_CONES_CSS[Math.round((fromOrtonConeId + toOrtonConeId) / 2)]
