@@ -1,4 +1,4 @@
-# vue-plotly-umf-charts2
+# vue-plotly-umf-charts
 
 ## Project setup
 ```
