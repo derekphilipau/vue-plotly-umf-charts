@@ -37,26 +37,21 @@
     </div>
     <div class="row">
       <div class="col">
-        <div class="field is-horizontal">
-
+        <b-form :inline="true" v-on:keydown.enter.prevent>
           <b-form-group id="searchInput">
             <b-input v-model="textComputed"
-                     placeholder="Keyword"></b-input>
+                     placeholder="Name"></b-input>
           </b-form-group>
 
-          <b-form-group id="glazeTypeGroup">
-            <b-select v-model="form.glazeType">
-              <option
-                      v-for="option in glazeTypes"
-                      :value="option.value"
-                      :key="option.value"
-              >
-                {{ option.text }}
-              </option>
-            </b-select>
+          <b-form-group id="glazetypeGroup">
+            <b-form-select id="glazetypeSelect"
+                          :options="glazetypes"
+                          v-model="form.glazeType">
+              <template slot="first">
+                <option :value="null">All Types</option>
+              </template>
+            </b-form-select>
           </b-form-group>
-
-
 
           <b-form-group id="oxide1">
             <b-select v-model="form.oxide1">
@@ -95,7 +90,7 @@
           </b-form-group>
 
           <button class="button is-info" @click="resetForm">Reset Form</button>
-        </div>
+        </b-form>
       </div>
     </div>
     <div class="row">
@@ -209,9 +204,9 @@ export default {
         isThreeAxes: false
       },
       oxides: Analysis.OXIDE_NAME_UNICODE_SELECT,
-      baseTypeId: new MaterialTypes().GLAZE_TYPE_ID,
-      glazeTypes: new MaterialTypes().GLAZES_SELECT,
-      cones: new GlazyConstants().ORTON_CONES_SELECT,
+      baseTypeId: MaterialTypes.GLAZE_TYPE_ID,
+      glazetypes: MaterialTypes.GLAZES_SELECT,
+      cones: GlazyConstants.ORTON_CONES_SELECT,
       colortypes: [
         { text: 'R2O:RO', value: 'r2o' },
         { text: 'Orton Cone', value: 'cone' },

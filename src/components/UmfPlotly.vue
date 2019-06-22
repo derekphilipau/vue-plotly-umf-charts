@@ -127,6 +127,8 @@
         isPlotlyDone: false,
         constants: new GlazyConstants(),
         materialTypes: new MaterialTypes(),
+        glazeTypeTree: MaterialTypes.GLAZE_TYPE_TREE,
+        glazeTypeId: MaterialTypes.GLAZE_TYPE_ID,
         minSearchTextLength: 3,
         defaultMarkerSize: 8,
         currentMarkerSize: 12,
@@ -258,9 +260,9 @@
 
         var materialTypeBranch = []
         if (this.materialTypeId &&
-          this.baseTypeId === this.materialTypes.GLAZE_TYPE_ID) {
-          if (this.materialTypes.GLAZE_TYPE_TREE[this.materialTypeId] !== 'undefined') {
-            materialTypeBranch = this.materialTypes.GLAZE_TYPE_TREE[this.materialTypeId]
+          this.baseTypeId === this.glazeTypeId) {
+          if (this.glazeTypeTree[this.materialTypeId] !== 'undefined') {
+            materialTypeBranch = this.glazeTypeTree[this.materialTypeId]
           }
         }
 
@@ -578,7 +580,7 @@
         if (this.showStullChart &&
           this.oxide2 === Analysis.OXIDE_NAME.SiO2 &&
           this.oxide1 === Analysis.OXIDE_NAME.Al2O3 &&
-          this.baseTypeId === this.materialTypes.GLAZE_TYPE_ID) {
+          this.baseTypeId === this.glazeTypeId) {
           // Limits of Stull chart are x: 0.5, 7.2, y: 0, 1
 
           if (this.filteredData) {
