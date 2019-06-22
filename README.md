@@ -1,5 +1,7 @@
 # vue-plotly-umf-charts
 
+This project uses the Plotly Javascript library (https://plot.ly/javascript/) to plot Glazy materials in a 2 or 3-dimensional scatterplot.
+
 ## Project setup
 ```
 npm install

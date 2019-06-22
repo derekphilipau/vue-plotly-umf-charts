@@ -168,7 +168,8 @@
 
 <script>
 import UmfPlotly from '../components/UmfPlotly'
-import StaticDataset from '../assets/data/all_api_output.edit.mini.json'
+//import StaticDataset from '../assets/data/all_api_output.edit.mini.json'
+import StaticDataset from '../assets/data/201906_all_api_output.mini.json'
 
 import Analysis from 'ceramicscalc-js/src/analysis/Analysis'
 import MaterialTypes from 'ceramicscalc-js/src/material/MaterialTypes'
